@@ -1,355 +1,12 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sistema de Inventario — Demo</title>
-<style>
-:root{
-  --grad: linear-gradient(to right, #f7ffc9, #e2e2e2);
-  --green: #048535;
-  --green-hover: #00c74c;
-  --text: #1f2937;
-  --muted: #6b7280;
-  --radius: 30px;
-}
-*{box-sizing:border-box}
-body{
-  margin:0;
-  font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  color: var(--text);
-  background: #f4f5f0;
-  min-height:100vh;
-}
-
-/* ---------- LOGIN ---------- */
-#login-screen{
-  min-height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background: var(--grad);
-}
-.login-card{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  width: 340px;
-  background: var(--grad);
-  padding: 44px 40px;
-  border-radius: 50px;
-  box-shadow: 0 20px 45px rgba(0,0,0,.08);
-}
-.login-logo{
-  width:64px;height:64px;border-radius:18px;
-  background:var(--green);
-  display:flex;align-items:center;justify-content:center;
-  color:#fff;font-weight:700;font-size:22px;
-  margin-bottom:14px;
-}
-.login-card h1{font-size:18px;margin:0 0 4px;text-align:center}
-.login-card p.sub{font-size:12.5px;color:var(--muted);margin:0 0 24px;text-align:center}
-.login-card input{
-  width:100%;
-  padding:12px 14px;
-  border-radius:14px;
-  border:1px solid rgba(0,0,0,.08);
-  margin-bottom:12px;
-  font-size:14px;
-  background:rgba(255,255,255,.75);
-}
-.login-card button{
-  width:100%;
-  background: var(--green);
-  color:#fff;
-  border:none;
-  padding:12px 20px;
-  border-radius:14px;
-  font-size:14px;
-  font-weight:600;
-  cursor:pointer;
-  transition:.25s;
-}
-.login-card button:hover{background:var(--green-hover)}
-.login-hint{
-  margin-top:16px;
-  font-size:11.5px;
-  color: var(--muted);
-  background:rgba(255,255,255,.6);
-  padding:8px 12px;
-  border-radius:12px;
-  text-align:center;
-}
-.login-error{
-  color:#B91C1C;
-  font-size:12.5px;
-  margin: -4px 0 10px;
-  display:none;
-}
-
-/* ---------- APP SHELL ---------- */
-#app{display:none}
-.navbar{
-  background: var(--grad);
-  padding: 14px 28px;
-  display:flex;
-  align-items:center;
-  gap:26px;
-}
-.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:14px;margin-right:12px}
-.brand .dot{width:34px;height:34px;border-radius:10px;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px}
-.nav-back-btn{
-  width:38px;height:38px;border-radius:50%;
-  background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.06);
-  display:flex;align-items:center;justify-content:center;
-  color:var(--text);cursor:pointer;transition:.2s;margin-right:14px;flex-shrink:0;
-}
-.nav-back-btn:hover{background:var(--green);color:#fff}
-.nav-back-btn.disabled{opacity:.35;pointer-events:none;box-shadow:none}
-.nav-pills{display:flex;gap:14px;list-style:none;margin:0;padding:0;flex:1}
-.nav-pill{
-  height:44px;
-  min-width:44px;
-  border-radius:44px;
-  background: var(--grad);
-  display:flex;align-items:center;
-  gap:8px;
-  padding:0 14px 0 12px;
-  cursor:pointer;
-  transition:.35s;
-  box-shadow:0 2px 8px rgba(0,0,0,0);
-  font-size:13px;
-  font-weight:600;
-  color:#374151;
-  white-space:nowrap;
-  overflow:hidden;
-}
-.nav-pill i{width:18px;text-align:center}
-.nav-pill span{opacity:0;max-width:0;transition:.35s}
-.nav-pill:hover span, .nav-pill.active span{opacity:1;max-width:160px;margin-left:2px}
-.nav-pill.active{background:#fff;box-shadow:0 8px 20px rgba(0,0,0,.08)}
-.logout-btn{
-  font-size:12.5px;color:var(--muted);cursor:pointer;
-  display:flex;align-items:center;gap:6px;
-}
-.logout-btn:hover{color:#B91C1C}
-
-.view{display:none;padding:32px 40px;max-width:1200px;margin:0 auto}
-.view.active{display:block}
-.view h2{font-size:22px;margin:0 0 4px}
-.view p.desc{color:var(--muted);font-size:13.5px;margin:0 0 24px}
-
-.card{
-  position:relative;
-  background:#fff;
-  border-radius: var(--radius);
-  box-shadow: 0 0 14px rgba(0,0,0,.07);
-  padding:26px;
-  overflow:hidden;
-}
-.card + .card{margin-top:20px}
-
-.home-grid{display:flex;flex-wrap:wrap;gap:20px}
-.home-card{
-  width:250px;
-  min-height:190px;
-  background:#fff;
-  border-radius: var(--radius);
-  box-shadow:0 0 14px rgba(0,0,0,.07);
-  padding:24px;
-  cursor:pointer;
-  transition:.3s;
-  display:flex;flex-direction:column;
-}
-.home-card:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(0,0,0,.10)}
-.home-card .icon{
-  width:46px;height:46px;border-radius:14px;
-  background: var(--grad);
-  display:flex;align-items:center;justify-content:center;
-  margin-bottom:16px;color:var(--green);font-size:18px;
-}
-.home-card h3{font-size:15px;margin:0 0 6px}
-.home-card p{font-size:12.5px;color:var(--muted);margin:0;line-height:1.5}
-
-table{width:100%;border-collapse:collapse;font-size:13px}
-th{
-  text-align:left;color:#6b7280;font-weight:600;font-size:11.5px;
-  text-transform:uppercase;letter-spacing:.03em;
-  padding:10px 12px;border-bottom:1px solid #eee;
-}
-td{padding:12px;border-bottom:1px solid #f3f4f6}
-tr:last-child td{border-bottom:none}
-.badge{
-  display:inline-block;padding:3px 10px;border-radius:20px;
-  font-size:11.5px;font-weight:600;
-}
-.badge.ok{background:#DCFCE7;color:#166534}
-.badge.warn{background:#FEF3C7;color:#92400E}
-.badge.late{background:#FEE2E2;color:#991B1B}
-.badge.info{background:#E0F2FE;color:#075985}
-
-/* Sub-tabs (Bodega: Entrada / Stock / Salida) */
-.subtabs{display:flex;gap:8px;margin-bottom:20px}
-.subtab{
-  padding:9px 18px;border-radius:14px;font-size:13.5px;font-weight:600;
-  color:var(--muted);cursor:pointer;background:#fff;box-shadow:0 0 10px rgba(0,0,0,.06);
-  display:flex;align-items:center;gap:8px;transition:.2s;
-}
-.subtab:hover{color:var(--text)}
-.subtab.active{background:var(--green);color:#fff;box-shadow:none}
-.subview{display:none}
-.subview.active{display:block}
-
-/* Fila de OC expandible (detalle por artículo) */
-.oc-row{cursor:pointer}
-.oc-row:hover{background:#F8FAFC}
-.oc-chevron{font-size:10px;color:var(--muted);margin-right:8px;transition:.2s transform;display:inline-block}
-.oc-chevron.open{transform:rotate(90deg)}
-.oc-detail td{border-bottom:none;padding:0 12px 16px}
-.oc-detail-wrap{background:#F8FAFC;border-radius:16px;padding:14px 16px}
-.oc-detail-title{font-size:12px;color:var(--muted);margin:0 0 10px;font-weight:600}
-.oc-detail-hint{font-weight:400;font-style:italic}
-.oc-detail-table{width:100%;border-collapse:collapse;font-size:12.5px}
-.oc-detail-table th{padding:6px 10px;font-size:10.5px}
-.oc-detail-table td{padding:8px 10px;border-bottom:1px solid #eee;background:#fff}
-.oc-detail-table tr:last-child td{border-bottom:1px solid #eee}
-.oc-linea-num{color:var(--muted)}
-.oc-linea-cat{font-size:11px;color:var(--muted)}
-
-.search-row{display:flex;gap:10px;margin-bottom:18px}
-.search-row input{
-  flex:1;max-width:320px;padding:10px 14px;border-radius:14px;
-  border:1px solid #e5e7eb;font-size:13.5px;
-}
-
-/* Upload module */
-.dropzone{
-  border:2px dashed #d7dbe0;
-  border-radius:24px;
-  padding:44px 20px;
-  text-align:center;
-  color:var(--muted);
-  cursor:pointer;
-  transition:.25s;
-}
-.dropzone:hover, .dropzone.drag{border-color:var(--green);background:#f4fff8}
-.dropzone i{font-size:26px;color:var(--green);margin-bottom:10px;display:block}
-.upload-btn{
-  background:var(--green);color:#fff;border:none;padding:10px 20px;
-  border-radius:14px;font-size:13px;font-weight:600;cursor:pointer;margin-top:14px;
-}
-.upload-btn:hover{background:var(--green-hover)}
-.progress-wrap{margin-top:18px;display:none}
-.progress-bar-bg{height:8px;background:#eee;border-radius:6px;overflow:hidden}
-.progress-bar-fill{height:100%;width:0%;background:var(--green);transition:.15s}
-.upload-status{font-size:12.5px;color:var(--muted);margin-top:8px}
-.upload-result{
-  display:none;margin-top:18px;background:#F0FDF4;border:1px solid #BBF7D0;
-  border-radius:16px;padding:16px 18px;font-size:13px;
-}
-.upload-result b{color:#166534}
-
-.note{font-size:11.5px;color:var(--muted);margin-top:18px;font-style:italic}
-
-/* Modal (carga de datos) */
-.modal-overlay{
-  display:none;position:fixed;inset:0;background:rgba(15,23,42,.45);
-  align-items:center;justify-content:center;z-index:50;
-}
-.modal-overlay.show{display:flex}
-.modal-box{
-  background:#fff;border-radius:26px;padding:28px 30px;width:420px;max-width:90vw;
-  box-shadow:0 30px 60px rgba(0,0,0,.2);
-}
-.modal-box input[type=text]{
-  width:100%;padding:12px 14px;border-radius:14px;
-  border:1px solid rgba(0,0,0,.08);margin-bottom:12px;font-size:14px;background:#fafafa;
-}
-.modal-box select{
-  width:100%;padding:12px 14px;border-radius:14px;
-  border:1px solid rgba(0,0,0,.08);margin-bottom:12px;font-size:14px;background:#fafafa;
-  color:var(--text);appearance:none;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;background-position:right 12px center;background-size:16px;
-}
-.proveedores-actions{display:flex;gap:10px;align-items:center}
-.proveedores-actions span{font-size:12.5px;color:var(--green);font-weight:600;cursor:pointer}
-
-/* Autocompletado de proveedor */
-.autocomplete-list{
-  display:none;position:absolute;left:0;right:0;top:calc(100% - 6px);
-  background:#fff;border-radius:14px;box-shadow:0 14px 30px rgba(0,0,0,.14);
-  max-height:200px;overflow-y:auto;z-index:5;padding:6px;
-}
-.autocomplete-list.show{display:block}
-.autocomplete-item{
-  padding:9px 12px;border-radius:10px;cursor:pointer;font-size:13.5px;
-}
-.autocomplete-item:hover, .autocomplete-item.hl{background:#F0FDF4}
-.autocomplete-item small{display:block;color:var(--muted);font-size:11px;margin-top:1px}
-
-.proveedor-info{
-  background:#F8FAFC;border:1px solid #eee;border-radius:16px;
-  padding:12px 16px;margin:-2px 0 14px;font-size:12.5px;
-}
-.proveedor-info .row{display:flex;justify-content:space-between;padding:3px 0;color:var(--muted)}
-.proveedor-info .row b{color:var(--text);font-weight:600}
-
-/* Bolsa de presupuesto (Reportes) */
-.bolsa-card{
-  width:260px;background:#fff;border-radius:22px;
-  box-shadow:0 0 14px rgba(0,0,0,.07);padding:18px 20px;
-}
-.bolsa-card h4{margin:0 0 2px;font-size:14px}
-.bolsa-card .cod{font-size:11px;color:var(--muted);margin-bottom:12px}
-.bolsa-bar-bg{height:8px;background:#eee;border-radius:6px;overflow:hidden;margin-bottom:8px}
-.bolsa-bar-fill{height:100%;background:var(--green)}
-.bolsa-bar-fill.warn{background:#D97706}
-.bolsa-bar-fill.danger{background:#DC2626}
-.bolsa-nums{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted)}
-.bolsa-nums b{color:var(--text);font-size:12.5px}
-
-.sim-box{
-  border-radius:18px;padding:16px 18px;font-size:13px;
-}
-.sim-box.ok{background:#F0FDF4;border:1px solid #BBF7D0}
-.sim-box.warn{background:#FFFBEB;border:1px solid #FDE68A}
-.sim-box.danger{background:#FEF2F2;border:1px solid #FECACA}
-
-/* Fila dinámica de categoría dentro de "Nuevo centro de costo" */
-.centro-cat-row{
-  display:flex;gap:8px;align-items:center;margin-bottom:8px;
-}
-.centro-cat-row input{margin-bottom:0}
-.centro-cat-row .centro-cat-nombre{flex:1.3;min-width:0}
-.centro-cat-row .centro-cat-monto{flex:1;min-width:0}
-.centro-cat-remove{
-  width:28px;height:28px;border-radius:50%;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-  color:var(--muted);cursor:pointer;transition:.2s;
-}
-.centro-cat-remove:hover{background:#FEE2E2;color:#B91C1C}
-
-/* Aviso: demo pensada para pantalla de computador */
-#mobile-warning{
-  display:none;position:fixed;top:0;left:0;right:0;z-index:200;
-  background:var(--text);color:#fff;padding:10px 44px 10px 18px;
-  font-size:12.5px;align-items:center;justify-content:center;gap:10px;
-  text-align:center;line-height:1.4;
-}
-#mobile-warning .close{
-  position:absolute;right:14px;top:50%;transform:translateY(-50%);
-  cursor:pointer;opacity:.75;flex-shrink:0;
-}
-#mobile-warning .close:hover{opacity:1}
-@media (max-width:900px){
-  #mobile-warning:not(.dismissed){display:flex}
-}
-
-
-.svgi{width:1em;height:1em;display:inline-block;vertical-align:-0.15em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
-.nav-pill .svgi{width:18px;height:18px}
-.home-card .svgi{width:20px;height:20px;color:var(--green)}
-.dropzone .svgi{width:26px;height:26px;color:var(--green);margin:0 auto 10px;display:block}
-.logout-btn .svgi{width:14px;height:14px}
-.nav-back-btn .svgi{width:16px;height:16px}
-
-</style>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
 <svg style="display:none" aria-hidden="true"><symbol id="i-house" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></symbol>
 <symbol id="i-cart-shopping" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></symbol>
 <symbol id="i-boxes-stacked" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></symbol>
@@ -371,8 +28,8 @@ tr:last-child td{border-bottom:none}
 <symbol id="i-chevron-right" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></symbol>
 <symbol id="i-circle-check" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></symbol>
 <symbol id="i-xmark" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
-<symbol id="i-truck" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></symbol></svg>
-
+<symbol id="i-truck" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></symbol>
+<symbol id="i-magnifying-glass" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol></svg>
 
 <div id="mobile-warning">
   <span><svg class="svgi" viewBox="0 0 24 24"><use href="#i-circle-info"/></svg> Este demo está diseñado para verse desde un computador — en pantallas chicas algunas tablas se ven apretadas.</span>
@@ -468,7 +125,7 @@ tr:last-child td{border-bottom:none}
 
     <div class="card" style="margin-bottom:20px">
       <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)">
-        <svg class="svgi" style="color:var(--green)" viewBox="0 0 24 24"><use href="#i-circle-info"/></svg>
+        <svg class="svgi" viewBox="0 0 24 24" style="color:var(--green)"><use href="#i-circle-info"/></svg>
         Última carga: <b id="carga-last-info" style="color:var(--text)">24-ago-2026 08:15 · por Randy Jiménez</b>
       </div>
     </div>
@@ -495,7 +152,7 @@ tr:last-child td{border-bottom:none}
     <p class="desc">Consulta cualquier OC por número, proveedor o estado.</p>
     <div class="search-row" style="justify-content:space-between">
       <input type="text" id="oc-search" placeholder="Buscar por N° de OC o proveedor...">
-      <button type="button" class="upload-btn" id="open-solicitud-btn" style="margin-top:0">+ Nueva solicitud de compra</button>
+      <button type="button" class="upload-btn" id="open-solicitud-btn" style="margin-top:0">+ Buscar OC y verificar presupuesto</button>
     </div>
     <div class="card">
       <table id="oc-table">
@@ -508,57 +165,62 @@ tr:last-child td{border-bottom:none}
     <p class="note">La OC se sigue generando y aprobando en Oracle EBS — aquí solo se consulta y se refleja su información.</p>
   </section>
 
-  <!-- MODAL: NUEVA SOLICITUD DE COMPRA -->
+  <!-- MODAL: BUSCAR OC Y VINCULAR A PRESUPUESTO -->
   <div class="modal-overlay" id="solicitud-modal">
-    <div class="modal-box" style="width:480px">
-      <h3 style="margin-bottom:4px">Nueva solicitud de compra</h3>
-      <p style="font-size:12.5px;color:var(--muted);margin-bottom:14px">Se genera la OC y se envía a aprobación — igual que hoy, pero sin salir de acá.</p>
+    <div class="modal-box" style="width:540px">
+      <h3 style="margin-bottom:4px">Buscar OC y verificar presupuesto</h3>
+      <p style="font-size:12.5px;color:var(--muted);margin-bottom:14px">La OC se crea en i10 — acá solo se busca por número (o se sube el archivo en Cargar datos) y se revisa su impacto en la bolsa de presupuesto.</p>
 
-      <div style="background:#F8FAFC;border-radius:12px;padding:9px 14px;margin-bottom:14px;font-size:12.5px;color:var(--muted)">
-        <div style="display:flex;align-items:center;gap:8px;padding:2px 0">
-          <svg class="svgi" style="color:var(--green);width:14px" viewBox="0 0 24 24"><use href="#i-user"/></svg>
-          Solicitante: <b id="sol-solicitante-nombre" style="color:var(--text)">—</b>
+      <div class="subtabs" id="sol-subtabs" style="margin-bottom:16px">
+        <div class="subtab active" data-solview="i10"><svg class="svgi" viewBox="0 0 24 24"><use href="#i-magnifying-glass"/></svg> N° de OC (i10)</div>
+        <div class="subtab" data-solview="carga"><svg class="svgi" viewBox="0 0 24 24"><use href="#i-database"/></svg> Cargar datos</div>
+      </div>
+
+      <div id="sol-subview-i10">
+        <div style="display:flex;gap:8px;margin-bottom:6px">
+          <input type="text" id="sol-oc-numero" placeholder="N° de OC, ej: 19501" style="flex:1;min-width:0;margin-bottom:0">
+          <button type="button" class="upload-btn" id="sol-oc-buscar-btn" style="margin-top:0;white-space:nowrap">Buscar</button>
         </div>
-        <div style="display:flex;align-items:center;gap:8px;padding:2px 0">
-          <svg class="svgi" style="color:var(--green);width:14px" viewBox="0 0 24 24"><use href="#i-calendar-day"/></svg>
-          Fecha de solicitud: <b id="sol-fecha" style="color:var(--text)">—</b>
+        <div class="oc-chips" id="sol-oc-chips">
+          <span class="oc-chip" data-oc="19501">19501 · Compresor vitrina (i10)</span>
+          <span class="oc-chip" data-oc="19502">19502 · Señalética sucursal (i10)</span>
+          <span class="oc-chip" data-oc="19503">19503 · Insumos aseo (i10)</span>
+          <span class="oc-chip" data-oc="18877">18877 · Vitrina refrigerada (ya en Compras)</span>
+        </div>
+        <p class="oc-chips-hint">Números de ejemplo para probar — en el sistema real vendrían de i10 o del archivo cargado.</p>
+        <div id="sol-oc-error" style="display:none;color:#B91C1C;font-size:12.5px;margin:8px 0">No se encontró esa OC en i10. Verifica el número o usa Cargar datos.</div>
+
+        <div id="sol-oc-resultado" style="display:none">
+          <div style="background:#F8FAFC;border-radius:12px;padding:10px 14px;margin:12px 0 14px;font-size:12.5px;color:var(--muted)">
+            <div style="display:flex;justify-content:space-between;padding:3px 0"><span>Proveedor</span><b style="color:var(--text)" id="sol-oc-proveedor">—</b></div>
+            <div style="display:flex;justify-content:space-between;padding:3px 0"><span>Producto</span><b style="color:var(--text)" id="sol-oc-producto">—</b></div>
+            <div style="display:flex;justify-content:space-between;padding:3px 0"><span>Cantidad</span><b style="color:var(--text)" id="sol-oc-cantidad">—</b></div>
+            <div style="display:flex;justify-content:space-between;padding:3px 0"><span>Monto</span><b style="color:var(--text)" id="sol-oc-monto">—</b></div>
+            <div style="display:flex;justify-content:space-between;padding:3px 0"><span>Fuente</span><b style="color:var(--text)" id="sol-oc-fuente">—</b></div>
+          </div>
+
+          <div style="display:flex;gap:10px;margin-bottom:14px">
+            <select id="sol-centro" style="flex:1;min-width:0;padding:12px 14px;border-radius:14px;border:1px solid rgba(0,0,0,.08);font-size:14px"></select>
+            <select id="sol-categoria" style="flex:1;min-width:0;padding:12px 14px;border-radius:14px;border:1px solid rgba(0,0,0,.08);font-size:14px"></select>
+          </div>
+
+          <div id="sol-bolsa-card" class="bolsa-card" style="width:auto;margin-bottom:14px"></div>
+
+          <label style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin:-2px 0 14px">
+            <input type="checkbox" id="sol-baja-activo" style="width:auto;margin:0"> Requiere baja de activo
+          </label>
+
+          <div id="sol-sim-box" class="sim-box ok" style="display:none;margin-bottom:14px"></div>
+          <button type="button" class="upload-btn" id="sol-submit-btn" style="width:100%;display:none">Vincular a presupuesto</button>
+          <div id="sol-success" style="display:none;margin-top:14px"></div>
         </div>
       </div>
 
-      <input type="text" id="sol-producto" placeholder="Producto o descripción">
-
-      <div style="position:relative;margin-bottom:6px">
-        <input type="text" id="sol-proveedor" placeholder="Escribe para buscar proveedor..." autocomplete="off" style="margin-bottom:0">
-        <div id="sol-proveedor-list" class="autocomplete-list"></div>
-      </div>
-      <div id="sol-proveedor-info" class="proveedor-info" style="display:none"></div>
-
-      <div style="display:flex;gap:10px;margin-bottom:12px">
-        <input type="text" id="sol-cantidad" placeholder="Cantidad, ej: 10" style="flex:1;min-width:0;width:auto;margin-bottom:0">
-        <input type="text" id="sol-precio" placeholder="Precio unitario, ej: 15000" style="flex:1;min-width:0;width:auto;margin-bottom:0">
+      <div id="sol-subview-carga" style="display:none">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Si ya tienes el archivo que exporta Oracle (líneas y cabeceras), súbelo directo en <b>Cargar datos</b> y las OC quedan disponibles automáticamente en Compras.</p>
+        <button type="button" class="upload-btn" id="sol-ir-carga-btn" style="width:100%">Ir a Cargar datos</button>
       </div>
 
-      <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);background:#F8FAFC;border-radius:12px;padding:9px 14px;margin-bottom:14px">
-        <svg class="svgi" style="color:var(--green)" viewBox="0 0 24 24"><use href="#i-calculator"/></svg>
-        Total: <b id="sol-total" style="color:var(--text);font-size:14.5px">$0</b>
-      </div>
-
-      <div style="display:flex;gap:10px;margin-bottom:14px">
-        <select id="sol-centro" style="flex:1;min-width:0;padding:12px 14px;border-radius:14px;border:1px solid rgba(0,0,0,.08);font-size:14px"></select>
-        <select id="sol-categoria" style="flex:1;min-width:0;padding:12px 14px;border-radius:14px;border:1px solid rgba(0,0,0,.08);font-size:14px"></select>
-      </div>
-
-      <div id="sol-bolsa-card" class="bolsa-card" style="width:auto;margin-bottom:14px"></div>
-
-      <label style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin:-2px 0 14px">
-        <input type="checkbox" id="sol-baja-activo" style="width:auto;margin:0"> Requiere baja de activo
-      </label>
-
-      <div id="sol-sim-box" class="sim-box ok" style="display:none;margin-bottom:14px"></div>
-      <div id="sol-error" style="display:none;color:#B91C1C;font-size:12.5px;margin-bottom:10px">Completa producto, proveedor, cantidad y precio unitario.</div>
-
-      <button type="button" class="upload-btn" id="sol-submit-btn" style="width:100%">Enviar a aprobación</button>
-      <div id="sol-success" style="display:none;margin-top:14px"></div>
       <div style="text-align:right;margin-top:14px"><span style="font-size:12.5px;color:var(--muted);cursor:pointer" id="sol-close">Cerrar</span></div>
     </div>
   </div>
@@ -575,6 +237,15 @@ tr:last-child td{border-bottom:none}
       </div>
 
       <div class="subview" id="subview-entrada">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px">
+          <label class="auto-toggle">
+            <input type="checkbox" id="auto-sync-entrada-toggle" checked>
+            <span class="auto-toggle-track"><span class="auto-toggle-thumb"></span></span>
+            <span class="auto-toggle-label">Automático</span>
+          </label>
+          <button type="button" class="upload-btn" id="open-guia-entrada-btn"><svg class="svgi" viewBox="0 0 24 24"><use href="#i-arrow-down-to-bracket"/></svg> Registrar guía</button>
+        </div>
+        <p class="auto-toggle-note" id="auto-sync-entrada-note">Las guías de i10 sin diferencias quedan registradas solas — revisa aquí solo las que necesiten ajuste.</p>
         <table id="entrada-table">
           <thead>
             <tr><th>Fecha</th><th>N° OC</th><th>Proveedor</th><th>Producto</th><th>Cant.</th><th>Precio unit.</th><th>Neto</th><th>IVA</th><th>Total</th><th>Sucursal</th></tr>
@@ -593,6 +264,15 @@ tr:last-child td{border-bottom:none}
       </div>
 
       <div class="subview" id="subview-salida">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px">
+          <label class="auto-toggle">
+            <input type="checkbox" id="auto-sync-salida-toggle" checked>
+            <span class="auto-toggle-track"><span class="auto-toggle-thumb"></span></span>
+            <span class="auto-toggle-label">Automático</span>
+          </label>
+          <button type="button" class="upload-btn" id="open-guia-salida-btn"><svg class="svgi" viewBox="0 0 24 24"><use href="#i-arrow-up-from-bracket"/></svg> Registrar guía</button>
+        </div>
+        <p class="auto-toggle-note" id="auto-sync-salida-note">Los despachos de i10 sin diferencias quedan registrados solos — revisa aquí solo los que necesiten ajuste.</p>
         <table id="salida-table">
           <thead>
             <tr><th>Fecha</th><th>Documento</th><th>Producto</th><th>Cant.</th><th>Sucursal</th><th>Motivo</th><th>Total</th></tr>
@@ -601,6 +281,12 @@ tr:last-child td{border-bottom:none}
         </table>
       </div>
       <p class="note">Haz clic en un producto de Stock para ver el detalle de cada lote de compra y el orden FIFO.</p>
+    </div>
+
+    <div class="card" style="margin-bottom:20px">
+      <h3 style="margin:0 0 4px;font-size:15px">Movimientos de hoy <span class="badge info">Automático</span></h3>
+      <p style="font-size:12.5px;color:var(--muted);margin:6px 0 16px">Al registrar una guía (o llegar automático desde i10), el stock se mueve solo — y si la OC ya quedó vinculada a un centro de costo, la bolsa de presupuesto se descuenta sin pasos manuales.</p>
+      <div id="movimientos-hoy-list"></div>
     </div>
 
     <div class="card">
@@ -624,7 +310,7 @@ tr:last-child td{border-bottom:none}
       <h3 style="margin:0 0 4px;font-size:15px">Inventario y conciliación anual <span class="badge info">Propuesta — a validar</span></h3>
       <p style="font-size:12.5px;color:var(--muted);margin:0 0 16px">Comparación de inventario físico vs. sistema — una vez al año, o al mes de abrir una tienda nueva. Regla: reflejar diferencias en sistema dentro de 72 horas.</p>
       <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted);background:#F8FAFC;border-radius:12px;padding:9px 14px;margin-bottom:16px">
-        <svg class="svgi" style="color:var(--green)" viewBox="0 0 24 24"><use href="#i-circle-info"/></svg>
+        <svg class="svgi" viewBox="0 0 24 24" style="color:var(--green)"><use href="#i-circle-info"/></svg>
         Último inventario: <b style="color:var(--text)">15-mar-2026</b> · Próximo: <b style="color:var(--text)">mar-2027</b>
       </div>
       <table>
@@ -752,10 +438,100 @@ tr:last-child td{border-bottom:none}
     </div>
   </div>
 
+  <!-- REGISTRAR GUIA DE ENTRADA (Bodega) -->
+  <div class="modal-overlay" id="guia-entrada-modal">
+    <div class="modal-box" style="width:480px">
+      <h3 style="margin-bottom:4px">Registrar guía de entrada</h3>
+      <p style="font-size:12.5px;color:var(--muted);margin-bottom:14px">La guía se crea en i10 — acá solo se busca por número para traer sus datos y registrar el movimiento.</p>
+
+      <div style="display:flex;gap:10px">
+        <input type="text" id="guia-in-numero" placeholder="N° de guía (i10), ej: GD-33210" style="flex:1">
+        <button type="button" class="upload-btn" id="guia-in-buscar-btn">Buscar</button>
+      </div>
+      <p class="oc-chips-hint">Guías de hoy — haz clic para buscarla:</p>
+      <div class="oc-chips" id="guia-in-chips"></div>
+      <div id="guia-in-error" style="display:none;color:#B91C1C;font-size:12.5px;margin:8px 0">No encontramos esa guía en i10.</div>
+
+      <div id="guia-in-form" style="display:none;margin-top:10px">
+        <table class="oc-detail-table" style="margin-bottom:12px">
+          <tbody>
+            <tr><td style="color:var(--muted)">Proveedor</td><td id="guia-in-proveedor" style="text-align:right;font-weight:600"></td></tr>
+            <tr><td style="color:var(--muted)">Producto</td><td id="guia-in-producto" style="text-align:right;font-weight:600"></td></tr>
+            <tr><td style="color:var(--muted)">N° OC de origen</td><td id="guia-in-oc" style="text-align:right;font-weight:600"></td></tr>
+            <tr><td style="color:var(--muted)">Sucursal / bodega destino</td><td id="guia-in-sucursal" style="text-align:right;font-weight:600"></td></tr>
+          </tbody>
+        </table>
+
+        <label style="font-size:12.5px;color:var(--muted);display:block;margin-bottom:4px">Cantidad realmente recibida <span style="font-style:italic">(ajústala si llegó distinto a lo declarado en la guía)</span></label>
+        <div style="display:flex;gap:10px">
+          <input type="text" id="guia-in-cantidad" placeholder="Cantidad" style="flex:1">
+          <input type="text" id="guia-in-udm" placeholder="UDM" style="flex:1" readonly>
+        </div>
+        <p style="font-size:12.5px;color:var(--muted);margin:6px 0 12px">Monto a registrar: <b id="guia-in-monto-preview" style="color:var(--text)"></b></p>
+
+        <div id="guia-in-bolsa-note" class="sim-box" style="display:none;margin-bottom:12px"></div>
+
+        <button type="button" class="upload-btn" id="guia-in-submit-btn" style="width:100%">Confirmar llegada</button>
+      </div>
+      <div id="guia-in-success" style="display:none;margin-top:12px"></div>
+
+      <div style="text-align:right;margin-top:14px"><span style="font-size:12.5px;color:var(--muted);cursor:pointer" id="guia-in-close">Cerrar</span></div>
+    </div>
+  </div>
+
+  <!-- REGISTRAR GUIA DE SALIDA (Bodega) -->
+  <div class="modal-overlay" id="guia-salida-modal">
+    <div class="modal-box" style="width:460px">
+      <h3 style="margin-bottom:4px">Registrar guía de salida</h3>
+      <p style="font-size:12.5px;color:var(--muted);margin-bottom:14px">También se crea en i10 (despacho a otra sucursal/departamento) — se busca por número. No toca presupuesto, ya se pagó al comprarlo.</p>
+
+      <div style="display:flex;gap:10px">
+        <input type="text" id="guia-out-numero" placeholder="N° de guía (i10), ej: GS-51002" style="flex:1">
+        <button type="button" class="upload-btn" id="guia-out-buscar-btn">Buscar</button>
+      </div>
+      <p class="oc-chips-hint">Guías de hoy — haz clic para buscarla:</p>
+      <div class="oc-chips" id="guia-out-chips"></div>
+      <div id="guia-out-error" style="display:none;color:#B91C1C;font-size:12.5px;margin:8px 0"></div>
+
+      <div id="guia-out-form" style="display:none;margin-top:10px">
+        <table class="oc-detail-table" style="margin-bottom:12px">
+          <tbody>
+            <tr><td style="color:var(--muted)">Producto</td><td id="guia-out-producto" style="text-align:right;font-weight:600"></td></tr>
+            <tr><td style="color:var(--muted)">Destino</td><td id="guia-out-sucursal" style="text-align:right;font-weight:600"></td></tr>
+            <tr><td style="color:var(--muted)">Motivo</td><td id="guia-out-motivo" style="text-align:right;font-weight:600"></td></tr>
+          </tbody>
+        </table>
+
+        <label style="font-size:12.5px;color:var(--muted);display:block;margin-bottom:4px">Cantidad realmente despachada <span style="font-style:italic">(ajústala si salió distinto a lo declarado)</span></label>
+        <div style="display:flex;gap:10px;margin-bottom:12px">
+          <input type="text" id="guia-out-cantidad" placeholder="Cantidad" style="flex:1">
+          <input type="text" id="guia-out-udm" placeholder="UDM" style="flex:1" readonly>
+        </div>
+
+        <button type="button" class="upload-btn" id="guia-out-submit-btn" style="width:100%">Confirmar despacho</button>
+      </div>
+      <div id="guia-out-success" style="display:none;margin-top:12px"></div>
+
+      <div style="text-align:right;margin-top:14px"><span style="font-size:12.5px;color:var(--muted);cursor:pointer" id="guia-out-close">Cerrar</span></div>
+    </div>
+  </div>
+
   <!-- FINANZAS -->
   <section class="view" id="view-finanzas">
     <h2>Cuentas por pagar</h2>
     <p class="desc">Estado de pago de facturas ya ingresadas y validadas — qué está por vencer, qué ya venció y qué se pagó.</p>
+
+    <div class="card" style="margin-bottom:20px">
+      <h3 style="margin:0;font-size:15px">Portal de proveedores <span class="badge info">Vista del proveedor</span></h3>
+      <p style="font-size:12.5px;color:var(--muted);margin:6px 0 0">Así consulta el proveedor el estado de sus facturas por su cuenta, sin llamar ni escribir — solo con su RUT.</p>
+      <div style="display:flex;gap:10px;margin-top:14px;max-width:440px">
+        <input type="text" id="portal-rut-input" placeholder="RUT del proveedor, ej: 76.123.456-7" style="flex:1">
+        <button type="button" class="upload-btn" id="portal-rut-btn">Consultar</button>
+      </div>
+      <p class="oc-chips-hint">RUT de ejemplo para probar: 76.123.456-7 · 77.234.567-8 · 76.345.678-9</p>
+      <div id="portal-error" style="display:none;color:#B91C1C;font-size:12.5px;margin-top:10px">No encontramos un proveedor con ese RUT.</div>
+      <div id="portal-resultado" style="display:none;margin-top:16px"></div>
+    </div>
 
     <div class="card" id="finanzas-resumen-card" style="margin-bottom:20px"></div>
 
@@ -807,969 +583,5 @@ tr:last-child td{border-bottom:none}
 </div>
 
 <script src="script.js"></script>
-
-<script>
-// ============ DATOS DE EJEMPLO (hardcodeados, solo para la demo) ============
-const OCS = [
-  { num: "19023", proveedor: "Distribuidora Andina S.A.", producto: "Cosmopolitan FD OX Plata 1A", monto: "$1.832.069", estado: "Pendiente de aprobación", badge: "warn" },
-  { num: "18892", proveedor: "Cerámicas Cordillera Ltda.", producto: "Porcelanato Cosmopolitan", monto: "$2.410.500", estado: "Aprobada", badge: "ok" },
-  { num: "18877", proveedor: "Refrigeración del Sur SpA", producto: "Vitrina refrigerada 2 puertas", monto: "$3.150.000", estado: "En Oracle EBS", badge: "info" },
-  { num: "18801", proveedor: "Insumos Perecibles Ñuble", producto: "Insumo perecible ejemplo", monto: "$412.300", estado: "Rechazada", badge: "late" },
-  { num: "18754", proveedor: "Hornos Industriales Chile", producto: "Horno industrial 2 bandejas", monto: "$4.980.000", estado: "Aprobada", badge: "ok" },
-];
-
-// Detalle por artículo de cada OC (línea por línea) — mismo formato que entrega
-// Oracle en el reporte de compras, con datos de ejemplo inventados para la demo.
-const LINEAS_OC = {
-  "19023": [
-    { linea: 1, articulo: "HB-2201", categoria: "Habilitadores (imagen)", descripcion: "Cosmopolitan FD OX Plata 1A", cantidad: 100, udm: "UNIDAD", precio: 14320, importe: 1432000 },
-    { linea: 2, articulo: "HB-2205", categoria: "Habilitadores (imagen)", descripcion: "Instalación y fijaciones", cantidad: 1, udm: "SERVICIO", precio: 400069, importe: 400069 },
-  ],
-  "18892": [
-    { linea: 1, articulo: "GN-3110", categoria: "General / otros", descripcion: "Porcelanato Cosmopolitan 60x60", cantidad: 190, udm: "M2", precio: 12000, importe: 2280000 },
-    { linea: 2, articulo: "GN-3115", categoria: "General / otros", descripcion: "Flete y despacho a sucursal", cantidad: 1, udm: "SERVICIO", precio: 130500, importe: 130500 },
-  ],
-  "18877": [
-    { linea: 1, articulo: "RF-1042", categoria: "Refrigeración", descripcion: "Vitrina refrigerada 2 puertas", cantidad: 1, udm: "UNIDAD", precio: 2950000, importe: 2950000 },
-    { linea: 2, articulo: "RF-1043", categoria: "Refrigeración", descripcion: "Instalación y puesta en marcha", cantidad: 1, udm: "SERVICIO", precio: 200000, importe: 200000 },
-  ],
-  "18801": [
-    { linea: 1, articulo: "GN-5501", categoria: "General / otros", descripcion: "Insumo perecible ejemplo", cantidad: 40, udm: "CAJA", precio: 10307.5, importe: 412300 },
-  ],
-  "18754": [
-    { linea: 1, articulo: "GN-6010", categoria: "General / otros", descripcion: "Horno industrial 2 bandejas", cantidad: 2, udm: "UNIDAD", precio: 2390000, importe: 4780000 },
-    { linea: 2, articulo: "GN-6015", categoria: "General / otros", descripcion: "Instalación y certificación gas", cantidad: 1, udm: "SERVICIO", precio: 200000, importe: 200000 },
-  ],
-};
-
-// Lotes de compra por producto (uno o más por producto) — cada lote trae la OC
-// que lo generó, la fecha de compra y la sucursal de destino, para poder ver
-// para qué centro es cada uno y en qué orden corresponde usarlos (FIFO: el
-// lote más antiguo se usa primero). Datos de ejemplo inventados para la demo.
-const LOTES_ACTIVO = {
-  "Horno industrial 2 bandejas": [
-    { oc: "17890", fecha: "02-mar-2026", cantidad: 1, udm: "UNIDAD", precio: 2150000, proveedor: "Hornos Industriales Chile", sucursal: "Sucursal OXXO Centro", vence: null },
-    { oc: "18754", fecha: "10-ago-2026", cantidad: 2, udm: "UNIDAD", precio: 2390000, proveedor: "Hornos Industriales Chile", sucursal: "Sucursal OXXO Sur", vence: null },
-  ],
-  "Vitrina refrigerada": [
-    { oc: "17650", fecha: "18-may-2026", cantidad: 2, udm: "UNIDAD", precio: 1500000, proveedor: "Refrigeración del Sur SpA", sucursal: "Bodega central", vence: null },
-  ],
-  "Porcelanato Cosmopolitan": [
-    { oc: "18210", fecha: "13-jul-2026", cantidad: 197.4, udm: "M2", precio: 11500, proveedor: "Cerámicas Cordillera Ltda.", sucursal: "Bodega central", vence: null },
-  ],
-  "Insumo perecible ejemplo": [
-    { oc: "17210", fecha: "22-jul-2026", cantidad: 40, udm: "CAJA", precio: 9800, proveedor: "Insumos Perecibles Ñuble", sucursal: "Sucursal OXXO Centro", vence: "20-sep-2026" },
-  ],
-};
-
-// Salidas de bodega ya despachadas — dataset propio (no se resta automáticamente
-// del stock de arriba; es solo para mostrar el tab "Salida" con datos de ejemplo).
-const SALIDAS_BODEGA = [
-  { fecha: "12-ago-2026", documento: "SAL-0231", producto: "Horno industrial 2 bandejas", cantidad: 1, udm: "UNIDAD", precio: 2390000, sucursal: "Sucursal OXXO Sur", motivo: "Instalación en sucursal", responsable: "Arias Rojas, Roberto Carlos" },
-  { fecha: "22-may-2026", documento: "SAL-0198", producto: "Vitrina refrigerada", cantidad: 1, udm: "UNIDAD", precio: 1500000, sucursal: "Sucursal OXXO Providencia", motivo: "Instalación en sucursal", responsable: "Arias Rojas, Roberto Carlos" },
-  { fecha: "02-ago-2026", documento: "SAL-0225", producto: "Insumo perecible ejemplo", cantidad: 10, udm: "CAJA", precio: 9800, sucursal: "Sucursal OXXO Centro", motivo: "Despacho a sucursal", responsable: "Arias Rojas, Roberto Carlos" },
-  { fecha: "16-ago-2026", documento: "SAL-0229", producto: "Insumo perecible ejemplo", cantidad: 5, udm: "CAJA", precio: 9800, sucursal: "Sucursal OXXO Sur", motivo: "Despacho a sucursal", responsable: "Arias Rojas, Roberto Carlos" },
-];
-
-const FACTURAS = [
-  { num: "F-4521", proveedor: "Distribuidora Andina S.A.", oc: "19023", sucursal: "Sucursal OXXO Centro", emision: "18-ago-2026", monto: "$1.832.069", venc: "28-ago-2026", estado: "Pagada", badge: "ok", nc: null },
-  { num: "F-4498", proveedor: "Cerámicas Cordillera Ltda.", oc: "18892", sucursal: "Bodega central", emision: "23-ago-2026", monto: "$2.410.500", venc: "02-sep-2026", estado: "Por vencer", badge: "warn", nc: { tipo: "Crédito", num: "NC-1032", monto: 150000 } },
-  { num: "F-4470", proveedor: "Refrigeración del Sur SpA", oc: "18877", sucursal: "Bodega central", emision: "09-ago-2026", monto: "$3.150.000", venc: "19-ago-2026", estado: "Vencida", badge: "late", nc: null },
-  { num: "F-4432", proveedor: "Hornos Industriales Chile", oc: "18754", sucursal: "Sucursal OXXO Sur", emision: "20-ago-2026", monto: "$4.980.000", venc: "30-ago-2026", estado: "Pagada", badge: "ok", nc: { tipo: "Débito", num: "ND-0087", monto: 60000 } },
-];
-
-const APROBACIONES = [
-  { num: "19023", enviada: "24-ago 09:12", resuelta: "—", tiempo: "1d 6h (en curso)", estado: "Pendiente de aprobación", badge: "warn" },
-  { num: "18892", enviada: "20-ago 11:40", resuelta: "20-ago 14:05", tiempo: "2h 25m", estado: "Aprobada", badge: "ok" },
-  { num: "18877", enviada: "18-ago 08:55", resuelta: "18-ago 10:10", tiempo: "1h 15m", estado: "Aprobada", badge: "ok" },
-  { num: "18801", enviada: "15-ago 16:20", resuelta: "17-ago 09:00", tiempo: "1d 16h 40m", estado: "Rechazada", badge: "late" },
-  { num: "18754", enviada: "10-ago 10:00", resuelta: "10-ago 11:30", tiempo: "1h 30m", estado: "Aprobada", badge: "ok" },
-];
-
-// Centros de costo (ej. sucursales nuevas) → cada uno con su bolsa de valores
-// dividida en categorías de artículo (propuesta a validar con OXXO)
-const CENTROS_COSTO = [
-  {
-    id: "CC-001",
-    nombre: "Sucursal Nueva — Talca Centro",
-    categorias: [
-      { cod: "RF", nombre: "Refrigeración", asignado: 8000000, consumido: 5230000 },
-      { cod: "HB", nombre: "Habilitadores (imagen)", asignado: 5000000, consumido: 4100000 },
-      { cod: "GN", nombre: "General / otros", asignado: 7000000, consumido: 3900000 },
-    ],
-  },
-  {
-    id: "CC-002",
-    nombre: "Sucursal Nueva — Curicó Oriente",
-    categorias: [
-      { cod: "RF", nombre: "Refrigeración", asignado: 6000000, consumido: 1200000 },
-      { cod: "HB", nombre: "Habilitadores (imagen)", asignado: 4000000, consumido: 800000 },
-      { cod: "GN", nombre: "General / otros", asignado: 5000000, consumido: 500000 },
-    ],
-  },
-];
-function centroPresupuesto(c) { return c.categorias.reduce((s, x) => s + x.asignado, 0); }
-function centroConsumido(c) { return c.categorias.reduce((s, x) => s + x.consumido, 0); }
-
-// Maestro de proveedores (datos de pago de ejemplo, solo para la demo)
-const PROVEEDORES = [
-  { nombre: "Distribuidora Andina S.A.", rut: "76.123.456-7", categoria: "Habilitadores (imagen)", banco: "Banco Estado", tipoCuenta: "Cuenta corriente", cuenta: "00-812-345671-1", condicionPago: "30 días", estado: "Activo" },
-  { nombre: "Cerámicas Cordillera Ltda.", rut: "77.234.567-8", categoria: "General / otros", banco: "Banco de Chile", tipoCuenta: "Cuenta corriente", cuenta: "00-119-882345-K", condicionPago: "Contado", estado: "Activo" },
-  { nombre: "Refrigeración del Sur SpA", rut: "76.345.678-9", categoria: "Refrigeración", banco: "Banco BCI", tipoCuenta: "Cuenta corriente", cuenta: "00-734-556781-3", condicionPago: "45 días", estado: "Activo" },
-  { nombre: "Insumos Perecibles Ñuble", rut: "77.456.789-0", categoria: "General / otros", banco: "Banco Santander", tipoCuenta: "Cuenta vista", cuenta: "00-041-229981-7", condicionPago: "Contado", estado: "Activo" },
-  { nombre: "Hornos Industriales Chile", rut: "76.567.890-1", categoria: "General / otros", banco: "Banco Itaú", tipoCuenta: "Cuenta corriente", cuenta: "00-556-113420-9", condicionPago: "30 días", estado: "Activo" },
-  { nombre: "Habilitadores Retail Ltda.", rut: "77.678.901-2", categoria: "Habilitadores (imagen)", banco: "Banco Scotiabank", tipoCuenta: "Cuenta corriente", cuenta: "00-902-774112-5", condicionPago: "60 días", estado: "Inactivo" },
-];
-
-// ============ LOGIN ============
-const loginForm = document.getElementById("login-form");
-const loginError = document.getElementById("login-error");
-
-loginForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const user = document.getElementById("login-user").value.trim();
-  const pass = document.getElementById("login-pass").value.trim();
-  if (user === "demo" && pass === "demo123") {
-    document.getElementById("login-screen").style.display = "none";
-    document.getElementById("app").style.display = "block";
-    loginError.style.display = "none";
-  } else {
-    loginError.style.display = "block";
-  }
-});
-
-document.getElementById("logout-btn").addEventListener("click", () => {
-  document.getElementById("app").style.display = "none";
-  document.getElementById("login-screen").style.display = "flex";
-  viewHistory = [];
-  currentView = "inicio";
-  document.querySelectorAll(".nav-pill").forEach(p => p.classList.toggle("active", p.dataset.view === "inicio"));
-  document.querySelectorAll(".view").forEach(v => v.classList.toggle("active", v.id === "view-inicio"));
-  updateBackBtn();
-});
-
-// ============ NAVEGACION ============
-let currentView = "inicio";
-let viewHistory = [];
-const navBackBtn = document.getElementById("nav-back-btn");
-
-function updateBackBtn() {
-  if (!navBackBtn) return;
-  navBackBtn.classList.toggle("disabled", viewHistory.length === 0);
-}
-function goToView(name, opts = {}) {
-  if (name === currentView) return;
-  if (!opts.skipHistory) viewHistory.push(currentView);
-  currentView = name;
-  document.querySelectorAll(".nav-pill").forEach(p => p.classList.toggle("active", p.dataset.view === name));
-  document.querySelectorAll(".view").forEach(v => v.classList.toggle("active", v.id === "view-" + name));
-  updateBackBtn();
-}
-function goBack() {
-  if (!viewHistory.length) return;
-  const prev = viewHistory.pop();
-  goToView(prev, { skipHistory: true });
-}
-navBackBtn?.addEventListener("click", goBack);
-updateBackBtn();
-
-document.querySelectorAll(".nav-pill").forEach(pill => {
-  pill.addEventListener("click", () => goToView(pill.dataset.view));
-});
-document.querySelectorAll(".home-card").forEach(card => {
-  card.addEventListener("click", () => goToView(card.dataset.goto));
-});
-
-// ============ RENDER TABLAS ============
-function renderOCs(list) {
-  const tbody = document.querySelector("#oc-table tbody");
-  tbody.innerHTML = list.map(oc => {
-    const lineas = LINEAS_OC[oc.num] || [];
-    const detailRows = lineas.map(l => `
-      <tr>
-        <td class="oc-linea-num">${l.linea}</td>
-        <td>${l.articulo}<br><span class="oc-linea-cat">${l.categoria}</span></td>
-        <td>${l.descripcion}</td>
-        <td>${l.cantidad} ${l.udm}</td>
-        <td>${fmtCLP(l.importe)}</td>
-      </tr>
-    `).join("");
-    return `
-      <tr class="oc-row" data-oc="${oc.num}">
-        <td><svg class="svgi oc-chevron" viewBox="0 0 24 24"><use href="#i-chevron-right"/></svg> <b>${oc.num}</b></td>
-        <td>${oc.proveedor}</td>
-        <td>${oc.producto}</td>
-        <td>${oc.monto}</td>
-        <td><span class="badge ${oc.badge}">${oc.estado}</span></td>
-      </tr>
-      <tr class="oc-detail" data-oc-detail="${oc.num}" style="display:none">
-        <td colspan="5">
-          <div class="oc-detail-wrap">
-            <p class="oc-detail-title">Detalle por artículo <span class="oc-detail-hint">— mismo formato que entrega Oracle</span></p>
-            <table class="oc-detail-table">
-              <thead><tr><th>Línea</th><th>Artículo</th><th>Descripción</th><th>Cant.</th><th>Importe</th></tr></thead>
-              <tbody>${detailRows}</tbody>
-            </table>
-          </div>
-        </td>
-      </tr>
-    `;
-  }).join("");
-
-  tbody.querySelectorAll(".oc-row").forEach(row => {
-    row.addEventListener("click", () => {
-      const num = row.dataset.oc;
-      const detail = tbody.querySelector(`.oc-detail[data-oc-detail="${num}"]`);
-      const chevron = row.querySelector(".oc-chevron");
-      const isOpen = detail.style.display !== "none";
-      detail.style.display = isOpen ? "none" : "table-row";
-      chevron.classList.toggle("open", !isOpen);
-    });
-  });
-}
-renderOCs(OCS);
-
-document.getElementById("oc-search").addEventListener("input", (e) => {
-  const q = e.target.value.toLowerCase();
-  renderOCs(OCS.filter(oc =>
-    oc.num.toLowerCase().includes(q) ||
-    oc.proveedor.toLowerCase().includes(q) ||
-    oc.producto.toLowerCase().includes(q)
-  ));
-});
-
-const MESES_CORTOS = { ene:0, feb:1, mar:2, abr:3, may:4, jun:5, jul:6, ago:7, sep:8, oct:9, nov:10, dic:11 };
-function parseFechaCorta(s) {
-  if (!s) return null;
-  const [d, mAbbr, y] = s.split("-");
-  return new Date(parseInt(y, 10), MESES_CORTOS[mAbbr.toLowerCase()], parseInt(d, 10));
-}
-function fmtCantidad(cantidad, udm) {
-  const unidad = udm === "M2" ? "m²" : udm.toLowerCase();
-  const cantTxt = typeof cantidad === "number" ? cantidad.toLocaleString("es-CL") : cantidad;
-  return `${cantTxt} ${unidad}`;
-}
-function calcValor(cantidad, precio) {
-  const neto = cantidad * precio;
-  return { neto, iva: neto * 0.19, total: neto * 1.19 };
-}
-
-// ============ BODEGA: ENTRADA / STOCK / SALIDA (sub-tabs) ============
-document.querySelectorAll("#bodega-subtabs .subtab").forEach(tab => {
-  tab.addEventListener("click", () => {
-    document.querySelectorAll("#bodega-subtabs .subtab").forEach(t => t.classList.toggle("active", t === tab));
-    const key = tab.dataset.subview;
-    document.querySelectorAll("#view-activos .subview").forEach(v => v.classList.toggle("active", v.id === "subview-" + key));
-  });
-});
-
-function renderEntradaBodega() {
-  const tbody = document.querySelector("#entrada-table tbody");
-  const rows = [];
-  Object.entries(LOTES_ACTIVO).forEach(([producto, lotes]) => {
-    lotes.forEach(l => rows.push({ producto, ...l }));
-  });
-  rows.sort((a, b) => parseFechaCorta(a.fecha) - parseFechaCorta(b.fecha));
-  tbody.innerHTML = rows.map(r => {
-    const { neto, iva, total } = calcValor(r.cantidad, r.precio);
-    return `
-      <tr>
-        <td>${r.fecha}</td>
-        <td><b>${r.oc}</b></td>
-        <td>${r.proveedor}</td>
-        <td>${r.producto}</td>
-        <td>${fmtCantidad(r.cantidad, r.udm)}</td>
-        <td>${fmtCLP(r.precio)}</td>
-        <td>${fmtCLP(neto)}</td>
-        <td>${fmtCLP(iva)}</td>
-        <td>${fmtCLP(total)}</td>
-        <td>${r.sucursal}</td>
-      </tr>
-    `;
-  }).join("");
-}
-renderEntradaBodega();
-
-function renderActivos() {
-  const tbody = document.querySelector("#activos-table tbody");
-  const productos = Object.keys(LOTES_ACTIVO);
-  tbody.innerHTML = productos.map((producto, idx) => {
-    const lotes = [...LOTES_ACTIVO[producto]].sort((a, b) => parseFechaCorta(a.fecha) - parseFechaCorta(b.fecha));
-    const cantidadTotal = lotes.reduce((s, l) => s + l.cantidad, 0);
-    const valorTotal = lotes.reduce((s, l) => s + calcValor(l.cantidad, l.precio).total, 0);
-    const sucursales = [...new Set(lotes.map(l => l.sucursal))];
-    const sucursalTxt = sucursales.length === 1 ? sucursales[0] : `${sucursales.length} sucursales`;
-    const vences = lotes.filter(l => l.vence).sort((a, b) => parseFechaCorta(a.vence) - parseFechaCorta(b.vence));
-    const proxVence = vences.length ? vences[0].vence : "—";
-
-    const detailRows = lotes.map((l, i) => {
-      const { total } = calcValor(l.cantidad, l.precio);
-      return `
-      <tr>
-        <td><b>${l.oc}</b></td>
-        <td>${l.fecha}</td>
-        <td>${fmtCantidad(l.cantidad, l.udm)}</td>
-        <td>${fmtCLP(l.precio)}</td>
-        <td>${fmtCLP(total)}</td>
-        <td>${l.sucursal}</td>
-        <td>${l.vence || "—"}</td>
-        <td>${i === 0 ? '<span class="badge ok">Usar primero (FIFO)</span>' : '<span class="badge info">En reserva</span>'}</td>
-      </tr>
-    `;
-    }).join("");
-
-    return `
-      <tr class="oc-row" data-idx="${idx}">
-        <td><svg class="svgi oc-chevron" viewBox="0 0 24 24"><use href="#i-chevron-right"/></svg> ${producto}</td>
-        <td>${fmtCantidad(cantidadTotal, lotes[0].udm)}</td>
-        <td>${sucursalTxt}</td>
-        <td>${fmtCLP(valorTotal)}</td>
-        <td>${lotes.length > 1 ? `<span class="badge info">${lotes.length} lotes</span>` : '<span class="badge ok">1 lote</span>'}</td>
-      </tr>
-      <tr class="oc-detail" data-detail-idx="${idx}" style="display:none">
-        <td colspan="5">
-          <div class="oc-detail-wrap">
-            <p class="oc-detail-title">Lotes de compra <span class="oc-detail-hint">— orden FIFO: el más antiguo se usa primero</span></p>
-            <table class="oc-detail-table">
-              <thead><tr><th>N° OC</th><th>Fecha compra</th><th>Cantidad</th><th>Precio unit.</th><th>Total</th><th>Sucursal</th><th>Vencim.</th><th>Prioridad</th></tr></thead>
-              <tbody>${detailRows}</tbody>
-            </table>
-          </div>
-        </td>
-      </tr>
-    `;
-  }).join("");
-
-  tbody.querySelectorAll(".oc-row").forEach(row => {
-    row.addEventListener("click", () => {
-      const idx = row.dataset.idx;
-      const detail = tbody.querySelector(`.oc-detail[data-detail-idx="${idx}"]`);
-      const chevron = row.querySelector(".oc-chevron");
-      const isOpen = detail.style.display !== "none";
-      detail.style.display = isOpen ? "none" : "table-row";
-      chevron.classList.toggle("open", !isOpen);
-    });
-  });
-}
-renderActivos();
-
-function renderSalidaBodega() {
-  const tbody = document.querySelector("#salida-table tbody");
-  tbody.innerHTML = SALIDAS_BODEGA.map(s => {
-    const { total } = calcValor(s.cantidad, s.precio);
-    return `
-      <tr>
-        <td>${s.fecha}</td>
-        <td><b>${s.documento}</b></td>
-        <td>${s.producto}</td>
-        <td>${fmtCantidad(s.cantidad, s.udm)}</td>
-        <td>${s.sucursal}</td>
-        <td>${s.motivo}</td>
-        <td>${fmtCLP(total)}</td>
-      </tr>
-    `;
-  }).join("");
-}
-renderSalidaBodega();
-
-function montoToNum(m) { return parseInt(String(m).replace(/[^\d]/g, ""), 10) || 0; }
-
-function renderFinanzasResumen() {
-  const card = document.getElementById("finanzas-resumen-card");
-  if (!card) return;
-  const grupos = { "Vencida": 0, "Por vencer": 0, "Pagada": 0 };
-  const badgeByEstado = { "Vencida": "late", "Por vencer": "warn", "Pagada": "ok" };
-  FACTURAS.forEach(f => { grupos[f.estado] = (grupos[f.estado] || 0) + montoToNum(f.monto); });
-  card.innerHTML = `
-    <h3 style="margin:0 0 4px;font-size:15px">Resumen de pagos a proveedores</h3>
-    <p style="font-size:12.5px;color:var(--muted);margin:0 0 16px">Para saber de un vistazo qué urge pagar.</p>
-    <div style="display:flex;gap:16px;flex-wrap:wrap">
-      ${Object.entries(grupos).map(([estado, total]) => `
-        <div style="flex:1;min-width:160px;background:#F8FAFC;border-radius:16px;padding:14px 16px">
-          <span class="badge ${badgeByEstado[estado]}">${estado}</span>
-          <div style="font-size:18px;font-weight:700;margin-top:8px">${fmtCLP(total)}</div>
-        </div>
-      `).join("")}
-    </div>
-  `;
-}
-
-function renderFinanzas() {
-  const tbody = document.querySelector("#finanzas-table tbody");
-  tbody.innerHTML = FACTURAS.map(f => {
-    const ncHtml = f.nc
-      ? `<span class="badge ${f.nc.tipo === "Crédito" ? "info" : "warn"}">${f.nc.num} · ${f.nc.tipo === "Crédito" ? "-" : "+"}${fmtCLP(f.nc.monto)}</span>`
-      : `<span style="color:var(--muted)">—</span>`;
-    return `
-    <tr>
-      <td><b>${f.num}</b></td>
-      <td>${f.proveedor}</td>
-      <td>${f.oc || "—"}</td>
-      <td>${f.sucursal || "—"}</td>
-      <td>${f.emision || "—"}</td>
-      <td>${f.venc}</td>
-      <td>${f.monto}</td>
-      <td>${ncHtml}</td>
-      <td><span class="badge ${f.badge}">${f.estado}</span></td>
-    </tr>
-  `;
-  }).join("");
-  renderFinanzasResumen();
-}
-renderFinanzas();
-
-function renderAprobaciones() {
-  const tbody = document.querySelector("#aprobacion-table tbody");
-  tbody.innerHTML = APROBACIONES.map(a => `
-    <tr>
-      <td><b>${a.num}</b></td>
-      <td>${a.enviada}</td>
-      <td>${a.resuelta}</td>
-      <td>${a.tiempo}</td>
-      <td><span class="badge ${a.badge}">${a.estado}</span></td>
-    </tr>
-  `).join("");
-}
-renderAprobaciones();
-
-// ============ CENTROS DE COSTO / BOLSA DE VALORES (propuesta) ============
-function fmtCLP(n) {
-  return "$" + Math.round(n).toLocaleString("es-CL");
-}
-function bolsaLevel(pct) {
-  if (pct >= 100) return "danger";
-  if (pct >= 80) return "warn";
-  return "ok";
-}
-function barraHtml(asignado, consumido) {
-  const pct = Math.min(100, (consumido / asignado) * 100);
-  const level = bolsaLevel(pct);
-  const barClass = level === "ok" ? "" : level;
-  return `<div class="bolsa-bar-bg"><div class="bolsa-bar-fill ${barClass}" style="width:${pct}%"></div></div>`;
-}
-
-function renderCentrosCosto() {
-  const wrap = document.getElementById("centros-costo-list");
-  if (!wrap) return;
-  wrap.innerHTML = CENTROS_COSTO.map(c => {
-    const presupuesto = centroPresupuesto(c);
-    const consumido = centroConsumido(c);
-    const catRows = c.categorias.map(cat => `
-      <div style="margin-top:10px">
-        <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px">
-          <span>${cat.nombre} <span style="color:var(--muted)">· ${cat.cod}</span></span>
-          <span style="color:var(--muted)">${fmtCLP(cat.consumido)} / ${fmtCLP(cat.asignado)}</span>
-        </div>
-        ${barraHtml(cat.asignado, cat.consumido)}
-      </div>
-    `).join("");
-    return `
-      <div class="card" style="margin-bottom:20px">
-        <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px">
-          <h3 style="margin:0;font-size:16px">${c.nombre}</h3>
-          <span style="font-size:12.5px;color:var(--muted)">Presupuesto total: <b style="color:var(--text)">${fmtCLP(presupuesto)}</b> · Consumido: <b style="color:var(--text)">${fmtCLP(consumido)}</b></span>
-        </div>
-        <p style="font-size:12px;color:var(--muted);margin:10px 0 0">Bolsa de valores — por categoría de artículo</p>
-        ${catRows}
-      </div>`;
-  }).join("");
-}
-renderCentrosCosto();
-
-// ============ COMPRAS POR CATEGORÍA / POR PROVEEDOR (Reportes) ============
-function aggregateLineas() {
-  const porCategoria = {};
-  const porProveedor = {};
-  OCS.forEach(oc => {
-    const lineas = LINEAS_OC[oc.num] || [];
-    lineas.forEach(l => {
-      porCategoria[l.categoria] = (porCategoria[l.categoria] || 0) + l.importe;
-      porProveedor[oc.proveedor] = (porProveedor[oc.proveedor] || 0) + l.importe;
-    });
-  });
-  return { porCategoria, porProveedor };
-}
-
-function renderBarraList(containerId, data) {
-  const wrap = document.getElementById(containerId);
-  if (!wrap) return;
-  const entries = Object.entries(data).sort((a, b) => b[1] - a[1]);
-  const total = entries.reduce((s, [, v]) => s + v, 0);
-  wrap.innerHTML = entries.map(([nombre, monto]) => {
-    const pct = total ? (monto / total * 100) : 0;
-    return `
-      <div style="margin-bottom:14px">
-        <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px">
-          <span>${nombre}</span>
-          <span style="color:var(--muted)">${fmtCLP(monto)} <span style="color:#c7cbd1">· ${pct.toFixed(0)}%</span></span>
-        </div>
-        <div class="bolsa-bar-bg"><div class="bolsa-bar-fill" style="width:${pct}%"></div></div>
-      </div>`;
-  }).join("");
-}
-
-function renderComprasAgregadas() {
-  const { porCategoria, porProveedor } = aggregateLineas();
-  renderBarraList("compras-categoria-list", porCategoria);
-  renderBarraList("compras-proveedor-list", porProveedor);
-}
-renderComprasAgregadas();
-
-function simulateImpact(centroId, cod, monto) {
-  const centro = CENTROS_COSTO.find(c => c.id === centroId);
-  const cat = centro.categorias.find(x => x.cod === cod);
-  const nuevoConsumido = cat.consumido + monto;
-  const pct = Math.min(999, (nuevoConsumido / cat.asignado) * 100);
-  const disponible = cat.asignado - nuevoConsumido;
-  const level = pct >= 100 ? "danger" : pct >= 80 ? "warn" : "ok";
-  return { centro, cat, pct, disponible, level };
-}
-function impactMessage({ centro, cat, pct, disponible }) {
-  return pct >= 100
-    ? `Esta OC deja la bolsa <b>${cat.nombre}</b> de <b>${centro.nombre}</b> en <b>${pct.toFixed(1)}%</b> — se pasaría por ${fmtCLP(Math.abs(disponible))}. Necesitaría una excepción o aprobación adicional.`
-    : `Si se aprueba, la bolsa <b>${cat.nombre}</b> de <b>${centro.nombre}</b> quedaría en <b>${pct.toFixed(1)}%</b> consumida, con <b>${fmtCLP(disponible)}</b> disponible.`;
-}
-
-// ============ NUEVO CENTRO DE COSTO ============
-const centroModal = document.getElementById("centro-modal");
-const centroCatRows = document.getElementById("centro-cat-rows");
-
-function addCentroCatRow(nombre = "", monto = "") {
-  const row = document.createElement("div");
-  row.className = "centro-cat-row";
-  row.innerHTML = `
-    <input type="text" class="centro-cat-nombre" placeholder="Categoría, ej: Refrigeración" value="${nombre}">
-    <input type="text" class="centro-cat-monto" placeholder="Presupuesto asignado" value="${monto}">
-    <span class="centro-cat-remove"><svg class="svgi" viewBox="0 0 24 24"><use href="#i-xmark"/></svg></span>
-  `;
-  row.querySelector(".centro-cat-remove").addEventListener("click", () => row.remove());
-  centroCatRows.appendChild(row);
-}
-
-document.getElementById("open-centro-btn")?.addEventListener("click", () => {
-  document.getElementById("centro-nombre").value = "";
-  centroCatRows.innerHTML = "";
-  addCentroCatRow("Refrigeración");
-  addCentroCatRow("Habilitadores (imagen)");
-  addCentroCatRow("General / otros");
-  document.getElementById("centro-error").style.display = "none";
-  centroModal.classList.add("show");
-});
-document.getElementById("centro-close")?.addEventListener("click", () => centroModal.classList.remove("show"));
-document.getElementById("centro-add-cat-btn")?.addEventListener("click", () => addCentroCatRow());
-
-document.getElementById("centro-submit-btn")?.addEventListener("click", () => {
-  const nombre = document.getElementById("centro-nombre").value.trim();
-  const catRows = Array.from(centroCatRows.querySelectorAll(".centro-cat-row")).map(row => ({
-    nombre: row.querySelector(".centro-cat-nombre").value.trim(),
-    monto: parseInt(row.querySelector(".centro-cat-monto").value.replace(/[^\d]/g, "") || "0", 10),
-  })).filter(c => c.nombre && c.monto);
-
-  if (!nombre || !catRows.length) {
-    document.getElementById("centro-error").style.display = "block";
-    return;
-  }
-  document.getElementById("centro-error").style.display = "none";
-
-  const nuevoId = "CC-" + String(100 + CENTROS_COSTO.length + 1);
-  CENTROS_COSTO.push({
-    id: nuevoId,
-    nombre,
-    categorias: catRows.map((c, i) => ({
-      cod: c.nombre.slice(0, 2).toUpperCase() + i,
-      nombre: c.nombre,
-      asignado: c.monto,
-      consumido: 0,
-    })),
-  });
-
-  renderCentrosCosto();
-  populateSolCentroSelect();
-  centroModal.classList.remove("show");
-});
-
-// ============ MAESTRO DE PROVEEDORES ============
-function renderProveedores() {
-  const tbody = document.querySelector("#proveedores-table tbody");
-  if (!tbody) return;
-  tbody.innerHTML = PROVEEDORES.map((p, idx) => `
-    <tr>
-      <td><b>${p.nombre}</b></td>
-      <td>${p.rut}</td>
-      <td>${p.categoria}</td>
-      <td>${p.banco} <span style="color:var(--muted);font-size:11.5px">· ${p.tipoCuenta}</span></td>
-      <td>${p.cuenta}</td>
-      <td>${p.condicionPago}</td>
-      <td><span class="badge ${p.estado === "Activo" ? "ok" : "late"}">${p.estado}</span></td>
-      <td><span class="proveedor-edit-btn" data-idx="${idx}" style="color:var(--green);font-weight:600;font-size:12.5px;cursor:pointer">Editar</span></td>
-    </tr>
-  `).join("");
-}
-renderProveedores();
-
-const proveedorModal = document.getElementById("proveedor-modal");
-let proveedorEditIdx = null;
-
-function fillProveedorForm(p) {
-  document.getElementById("proveedor-nombre").value = p ? p.nombre : "";
-  document.getElementById("proveedor-rut").value = p ? p.rut : "";
-  document.getElementById("proveedor-categoria").value = p ? p.categoria : "Refrigeración";
-  document.getElementById("proveedor-banco").value = p ? p.banco : "Banco Estado";
-  document.getElementById("proveedor-tipo-cuenta").value = p ? p.tipoCuenta : "Cuenta corriente";
-  document.getElementById("proveedor-cuenta").value = p ? p.cuenta : "";
-  document.getElementById("proveedor-condicion").value = p ? p.condicionPago : "30 días";
-  document.getElementById("proveedor-error").style.display = "none";
-}
-
-document.getElementById("open-proveedor-btn")?.addEventListener("click", () => {
-  proveedorEditIdx = null;
-  document.getElementById("proveedor-modal-title").textContent = "Nuevo proveedor";
-  fillProveedorForm(null);
-  proveedorModal.classList.add("show");
-});
-
-document.querySelector("#proveedores-table")?.addEventListener("click", (e) => {
-  const btn = e.target.closest(".proveedor-edit-btn");
-  if (!btn) return;
-  proveedorEditIdx = parseInt(btn.dataset.idx, 10);
-  document.getElementById("proveedor-modal-title").textContent = "Editar proveedor";
-  fillProveedorForm(PROVEEDORES[proveedorEditIdx]);
-  proveedorModal.classList.add("show");
-});
-
-document.getElementById("proveedor-close")?.addEventListener("click", () => proveedorModal.classList.remove("show"));
-
-document.getElementById("proveedor-submit-btn")?.addEventListener("click", () => {
-  const nombre = document.getElementById("proveedor-nombre").value.trim();
-  const rut = document.getElementById("proveedor-rut").value.trim();
-  const cuenta = document.getElementById("proveedor-cuenta").value.trim();
-  const categoria = document.getElementById("proveedor-categoria").value;
-  const banco = document.getElementById("proveedor-banco").value;
-  const tipoCuenta = document.getElementById("proveedor-tipo-cuenta").value;
-  const condicionPago = document.getElementById("proveedor-condicion").value;
-
-  if (!nombre || !rut || !cuenta) {
-    document.getElementById("proveedor-error").style.display = "block";
-    return;
-  }
-  document.getElementById("proveedor-error").style.display = "none";
-
-  const registro = { nombre, rut, categoria, banco, tipoCuenta, cuenta, condicionPago, estado: "Activo" };
-  if (proveedorEditIdx !== null) {
-    PROVEEDORES[proveedorEditIdx] = { ...PROVEEDORES[proveedorEditIdx], ...registro };
-  } else {
-    PROVEEDORES.push(registro);
-  }
-
-  renderProveedores();
-  proveedorModal.classList.remove("show");
-});
-
-// ============ NUEVA SOLICITUD DE COMPRA ============
-const solicitudModal = document.getElementById("solicitud-modal");
-const solCentro = document.getElementById("sol-centro");
-const solCategoria = document.getElementById("sol-categoria");
-const solCantidad = document.getElementById("sol-cantidad");
-const solPrecio = document.getElementById("sol-precio");
-const solTotalDisplay = document.getElementById("sol-total");
-const solProveedorInput = document.getElementById("sol-proveedor");
-const solProveedorList = document.getElementById("sol-proveedor-list");
-const solProveedorInfo = document.getElementById("sol-proveedor-info");
-const solBolsaCard = document.getElementById("sol-bolsa-card");
-const solSimBox = document.getElementById("sol-sim-box");
-const solError = document.getElementById("sol-error");
-const solSuccess = document.getElementById("sol-success");
-let solProveedorSeleccionado = null;
-
-// Centro de costo → categoría: selects en cascada
-function populateSolCategoriaSelect(centroId) {
-  const centro = CENTROS_COSTO.find(c => c.id === centroId);
-  solCategoria.innerHTML = centro
-    ? centro.categorias.map(cat => `<option value="${cat.cod}">${cat.nombre} (${cat.cod})</option>`).join("")
-    : "";
-}
-function populateSolCentroSelect() {
-  const prev = solCentro.value;
-  solCentro.innerHTML = CENTROS_COSTO.map(c => `<option value="${c.id}">${c.nombre}</option>`).join("");
-  solCentro.value = CENTROS_COSTO.some(c => c.id === prev) ? prev : (CENTROS_COSTO[0] && CENTROS_COSTO[0].id);
-  populateSolCategoriaSelect(solCentro.value);
-}
-populateSolCentroSelect();
-
-solCentro.addEventListener("change", () => {
-  populateSolCategoriaSelect(solCentro.value);
-  updateSolSim();
-});
-
-function renderSolBolsaCard() {
-  const centro = CENTROS_COSTO.find(c => c.id === solCentro.value);
-  const cat = centro && centro.categorias.find(x => x.cod === solCategoria.value);
-  if (!centro || !cat) { solBolsaCard.innerHTML = ""; return; }
-  const pct = Math.min(100, (cat.consumido / cat.asignado) * 100);
-  const barClass = bolsaLevel(pct) === "ok" ? "" : bolsaLevel(pct);
-  solBolsaCard.innerHTML = `
-    <h4>${cat.nombre} <span style="font-weight:400;color:var(--muted);font-size:12px">· ${centro.nombre}</span></h4>
-    <div class="cod">Código ${cat.cod}</div>
-    <div class="bolsa-bar-bg"><div class="bolsa-bar-fill ${barClass}" style="width:${pct}%"></div></div>
-    <div class="bolsa-nums">
-      <span>Consumido<br><b>${fmtCLP(cat.consumido)}</b></span>
-      <span style="text-align:right">Disponible<br><b>${fmtCLP(cat.asignado - cat.consumido)}</b></span>
-    </div>`;
-}
-
-function renderProveedorList(query) {
-  const q = query.trim().toLowerCase();
-  const matches = q ? PROVEEDORES.filter(p => p.nombre.toLowerCase().includes(q)) : PROVEEDORES;
-  if (!matches.length) { solProveedorList.classList.remove("show"); return; }
-  solProveedorList.innerHTML = matches.map((p, i) => `
-    <div class="autocomplete-item" data-idx="${PROVEEDORES.indexOf(p)}">
-      ${p.nombre}<small>${p.rut} · ${p.condicionPago}</small>
-    </div>
-  `).join("");
-  solProveedorList.classList.add("show");
-}
-
-function selectProveedor(p) {
-  solProveedorSeleccionado = p;
-  solProveedorInput.value = p.nombre;
-  solProveedorList.classList.remove("show");
-  solProveedorInfo.style.display = "block";
-  solProveedorInfo.innerHTML = `
-    <div class="row"><span>RUT</span><b>${p.rut}</b></div>
-    <div class="row"><span>Banco</span><b>${p.banco}</b></div>
-    <div class="row"><span>Tipo de cuenta</span><b>${p.tipoCuenta}</b></div>
-    <div class="row"><span>Condición de pago</span><b>${p.condicionPago}</b></div>
-  `;
-}
-
-solProveedorInput.addEventListener("focus", () => renderProveedorList(solProveedorInput.value));
-solProveedorInput.addEventListener("input", () => {
-  solProveedorSeleccionado = null;
-  solProveedorInfo.style.display = "none";
-  renderProveedorList(solProveedorInput.value);
-});
-solProveedorInput.addEventListener("blur", () => {
-  setTimeout(() => solProveedorList.classList.remove("show"), 150);
-});
-solProveedorList.addEventListener("mousedown", (e) => {
-  const item = e.target.closest(".autocomplete-item");
-  if (!item) return;
-  selectProveedor(PROVEEDORES[parseInt(item.dataset.idx, 10)]);
-});
-
-function calcSolTotal() {
-  const cant = parseFloat(solCantidad.value.replace(/[^\d.]/g, "") || "0");
-  const precio = parseInt(solPrecio.value.replace(/[^\d]/g, "") || "0", 10);
-  return Math.round(cant * precio);
-}
-
-document.getElementById("open-solicitud-btn").addEventListener("click", () => {
-  document.getElementById("sol-solicitante-nombre").textContent = CURRENT_USER;
-  document.getElementById("sol-fecha").textContent = fmtFecha(new Date());
-  document.getElementById("sol-producto").value = "";
-  solProveedorInput.value = "";
-  solProveedorSeleccionado = null;
-  solProveedorInfo.style.display = "none";
-  solProveedorList.classList.remove("show");
-  document.getElementById("sol-baja-activo").checked = false;
-  solCantidad.value = "";
-  solPrecio.value = "";
-  solTotalDisplay.textContent = "$0";
-  solSimBox.style.display = "none";
-  solError.style.display = "none";
-  solSuccess.style.display = "none";
-  document.getElementById("sol-submit-btn").style.display = "block";
-  populateSolCentroSelect();
-  renderSolBolsaCard();
-  solicitudModal.classList.add("show");
-});
-document.getElementById("sol-close").addEventListener("click", () => solicitudModal.classList.remove("show"));
-
-function updateSolSim() {
-  renderSolBolsaCard();
-  const total = calcSolTotal();
-  solTotalDisplay.textContent = fmtCLP(total);
-  if (!total) { solSimBox.style.display = "none"; return; }
-  const impact = simulateImpact(solCentro.value, solCategoria.value, total);
-  solSimBox.style.display = "block";
-  solSimBox.className = "sim-box " + impact.level;
-  solSimBox.innerHTML = impactMessage(impact);
-}
-solCantidad.addEventListener("input", updateSolSim);
-solPrecio.addEventListener("input", updateSolSim);
-solCategoria.addEventListener("change", updateSolSim);
-
-document.getElementById("sol-submit-btn").addEventListener("click", () => {
-  const producto = document.getElementById("sol-producto").value.trim();
-  const proveedor = solProveedorInput.value.trim();
-  const monto = calcSolTotal();
-
-  if (!producto || !proveedor || !monto) {
-    solError.style.display = "block";
-    return;
-  }
-  solError.style.display = "none";
-
-  const centro = CENTROS_COSTO.find(c => c.id === solCentro.value);
-  const cat = centro.categorias.find(x => x.cod === solCategoria.value);
-  cat.consumido += monto;
-
-  const nuevoNum = String(19100 + Math.floor(Math.random() * 800));
-  OCS.unshift({
-    num: nuevoNum, proveedor, producto,
-    monto: fmtCLP(monto), estado: "Pendiente de aprobación", badge: "warn",
-  });
-  const ahora = fmtFecha(new Date());
-  APROBACIONES.unshift({
-    num: nuevoNum, enviada: ahora, resuelta: "—",
-    tiempo: "recién enviada", estado: "Pendiente de aprobación", badge: "warn",
-  });
-
-  renderOCs(OCS);
-  renderAprobaciones();
-  renderCentrosCosto();
-  renderSolBolsaCard();
-
-  document.getElementById("sol-submit-btn").style.display = "none";
-  solSuccess.style.display = "block";
-  solSuccess.className = "sim-box ok";
-  solSuccess.innerHTML = `<b><svg class="svgi" viewBox="0 0 24 24"><use href="#i-circle-check"/></svg> Solicitud enviada</b><br>Solicitante: <b>${CURRENT_USER}</b><br>Se generó la OC <b>${nuevoNum}</b> y quedó enviada a aprobación (${cat.nombre} · ${centro.nombre}). La puedes ver en la tabla de Compras y en Reportes.`;
-});
-
-document.getElementById("reportes-ir-centros-btn")?.addEventListener("click", () => goToView("centros"));
-
-// ============ CARGA DE DATOS DESDE ORACLE (simulada) ============
-const CURRENT_USER = "Randy Jiménez";
-const MESES = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
-function fmtFecha(d) {
-  const dd = String(d.getDate()).padStart(2, "0");
-  const mm = MESES[d.getMonth()];
-  const hh = String(d.getHours()).padStart(2, "0");
-  const mi = String(d.getMinutes()).padStart(2, "0");
-  return `${dd}-${mm}-${d.getFullYear()} ${hh}:${mi}`;
-}
-
-const cargaList = document.getElementById("carga-list");
-const cargaProgressFill = document.getElementById("carga-progress-fill");
-const cargaStatus = document.getElementById("carga-status");
-const cargaResult = document.getElementById("carga-result");
-const cargaFileInput = document.getElementById("carga-file-input");
-const cargaDropzone = document.getElementById("carga-dropzone");
-
-document.getElementById("carga-pick-btn").addEventListener("click", () => cargaFileInput.click());
-cargaFileInput.addEventListener("change", () => {
-  if (cargaFileInput.files.length) simulateCarga(Array.from(cargaFileInput.files));
-});
-["dragenter", "dragover"].forEach(evt =>
-  cargaDropzone.addEventListener(evt, (e) => { e.preventDefault(); cargaDropzone.classList.add("drag"); })
-);
-["dragleave", "drop"].forEach(evt =>
-  cargaDropzone.addEventListener(evt, (e) => { e.preventDefault(); cargaDropzone.classList.remove("drag"); })
-);
-cargaDropzone.addEventListener("drop", (e) => {
-  if (e.dataTransfer.files.length) simulateCarga(Array.from(e.dataTransfer.files));
-});
-
-function simulateCarga(files) {
-  cargaResult.style.display = "none";
-  cargaList.style.display = "block";
-  cargaProgressFill.style.width = "0%";
-  let i = 0;
-  const timer = setInterval(() => {
-    i++;
-    const pct = Math.min(100, (i / files.length) * 100);
-    cargaProgressFill.style.width = pct + "%";
-    cargaStatus.textContent = i <= files.length
-      ? `Procesando ${i} de ${files.length}: ${files[i - 1].name}`
-      : "Listo";
-    if (i >= files.length) {
-      clearInterval(timer);
-      setTimeout(finishCarga, 500);
-    }
-  }, 500);
-}
-
-function finishCarga() {
-  cargaList.style.display = "none";
-  cargaResult.style.display = "block";
-  const ocsNuevas = Math.floor(Math.random() * 40) + 180;
-  const activosNuevos = Math.floor(Math.random() * 10) + 4;
-  const facturasNuevas = Math.floor(Math.random() * 6) + 1;
-  cargaResult.innerHTML = `
-    <b><svg class="svgi" viewBox="0 0 24 24"><use href="#i-circle-check"/></svg> Datos actualizados</b><br>
-    OC actualizadas: <b>${ocsNuevas}</b><br>
-    Activos nuevos: <b>${activosNuevos}</b><br>
-    Facturas nuevas: <b>${facturasNuevas}</b>
-  `;
-  cargaFileInput.value = "";
-
-  const infoEl = document.getElementById("carga-last-info");
-  if (infoEl) infoEl.textContent = `${fmtFecha(new Date())} · por ${CURRENT_USER}`;
-}
-
-// ============ CARGA DE FACTURA (simulada, sin backend real) ============
-const dropzone = document.getElementById("dropzone");
-const fileInput = document.getElementById("file-input");
-const pickBtn = document.getElementById("pick-file-btn");
-const progressWrap = document.getElementById("progress-wrap");
-const progressFill = document.getElementById("progress-fill");
-const uploadStatus = document.getElementById("upload-status");
-const uploadResult = document.getElementById("upload-result");
-
-pickBtn.addEventListener("click", () => fileInput.click());
-fileInput.addEventListener("change", () => {
-  if (fileInput.files[0]) simulateUpload(fileInput.files[0]);
-});
-
-["dragenter", "dragover"].forEach(evt =>
-  dropzone.addEventListener(evt, (e) => { e.preventDefault(); dropzone.classList.add("drag"); })
-);
-["dragleave", "drop"].forEach(evt =>
-  dropzone.addEventListener(evt, (e) => { e.preventDefault(); dropzone.classList.remove("drag"); })
-);
-dropzone.addEventListener("drop", (e) => {
-  const file = e.dataTransfer.files[0];
-  if (file) simulateUpload(file);
-});
-
-function simulateUpload(file) {
-  uploadResult.style.display = "none";
-  progressWrap.style.display = "block";
-  progressFill.style.width = "0%";
-  uploadStatus.textContent = `Subiendo "${file.name}"...`;
-
-  let pct = 0;
-  const timer = setInterval(() => {
-    pct += Math.random() * 22 + 10;
-    if (pct >= 100) {
-      pct = 100;
-      clearInterval(timer);
-      uploadStatus.textContent = "Validando contra orden de compra...";
-      setTimeout(() => finishUpload(file), 700);
-    }
-    progressFill.style.width = pct + "%";
-  }, 250);
-}
-
-function finishUpload(file) {
-  progressWrap.style.display = "none";
-  const rec = "REC-" + Math.floor(10000 + Math.random() * 89999);
-  const now = new Date();
-  const hh = String(now.getHours()).padStart(2, "0");
-  const mm = String(now.getMinutes()).padStart(2, "0");
-  uploadResult.style.display = "block";
-  uploadResult.innerHTML = `
-    <b><svg class="svgi" viewBox="0 0 24 24"><use href="#i-circle-check"/></svg> Factura registrada</b><br>
-    Archivo: <b>${file.name}</b><br>
-    N° de recepción: <b>${rec}</b> · Ingresada a las ${hh}:${mm}<br>
-    Estado: pendiente de validar aprobación de OC en Oracle.
-  `;
-  fileInput.value = "";
-}
-
-// ============ AVISO: DEMO PENSADA PARA COMPUTADOR ============
-document.getElementById("mobile-warning-close")?.addEventListener("click", () => {
-  document.getElementById("mobile-warning").classList.add("dismissed");
-});
-
-</script>
+</body>
+</html>
