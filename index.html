@@ -4,7 +4,402 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sistema de Inventario — Demo</title>
-<link rel="stylesheet" href="style.css">
+<style>
+:root{
+  --grad: linear-gradient(to right, #f7ffc9, #e2e2e2);
+  --green: #048535;
+  --green-hover: #00c74c;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --radius: 30px;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  color: var(--text);
+  background: #f4f5f0;
+  min-height:100vh;
+}
+
+/* ---------- LOGIN ---------- */
+#login-screen{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background: var(--grad);
+}
+.login-card{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  width: 340px;
+  background: var(--grad);
+  padding: 44px 40px;
+  border-radius: 50px;
+  box-shadow: 0 20px 45px rgba(0,0,0,.08);
+}
+.login-logo{
+  width:64px;height:64px;border-radius:18px;
+  background:var(--green);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-weight:700;font-size:22px;
+  margin-bottom:14px;
+}
+.login-card h1{font-size:18px;margin:0 0 4px;text-align:center}
+.login-card p.sub{font-size:12.5px;color:var(--muted);margin:0 0 24px;text-align:center}
+.login-card input{
+  width:100%;
+  padding:12px 14px;
+  border-radius:14px;
+  border:1px solid rgba(0,0,0,.08);
+  margin-bottom:12px;
+  font-size:14px;
+  background:rgba(255,255,255,.75);
+}
+.login-card button{
+  width:100%;
+  background: var(--green);
+  color:#fff;
+  border:none;
+  padding:12px 20px;
+  border-radius:14px;
+  font-size:14px;
+  font-weight:600;
+  cursor:pointer;
+  transition:.25s;
+}
+.login-card button:hover{background:var(--green-hover)}
+.login-hint{
+  margin-top:16px;
+  font-size:11.5px;
+  color: var(--muted);
+  background:rgba(255,255,255,.6);
+  padding:8px 12px;
+  border-radius:12px;
+  text-align:center;
+}
+.login-error{
+  color:#B91C1C;
+  font-size:12.5px;
+  margin: -4px 0 10px;
+  display:none;
+}
+
+/* ---------- APP SHELL ---------- */
+#app{display:none}
+.navbar{
+  background: var(--grad);
+  padding: 14px 28px;
+  display:flex;
+  align-items:center;
+  gap:26px;
+}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:14px;margin-right:12px}
+.brand .dot{width:34px;height:34px;border-radius:10px;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px}
+.nav-back-btn{
+  width:38px;height:38px;border-radius:50%;
+  background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.06);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--text);cursor:pointer;transition:.2s;margin-right:14px;flex-shrink:0;
+}
+.nav-back-btn:hover{background:var(--green);color:#fff}
+.nav-back-btn.disabled{opacity:.35;pointer-events:none;box-shadow:none}
+.nav-pills{display:flex;gap:14px;list-style:none;margin:0;padding:0;flex:1}
+.nav-pill{
+  height:44px;
+  min-width:44px;
+  border-radius:44px;
+  background: var(--grad);
+  display:flex;align-items:center;
+  gap:8px;
+  padding:0 14px 0 12px;
+  cursor:pointer;
+  transition:.35s;
+  box-shadow:0 2px 8px rgba(0,0,0,0);
+  font-size:13px;
+  font-weight:600;
+  color:#374151;
+  white-space:nowrap;
+  overflow:hidden;
+}
+.nav-pill i{width:18px;text-align:center}
+.nav-pill span{opacity:0;max-width:0;transition:.35s}
+.nav-pill:hover span, .nav-pill.active span{opacity:1;max-width:160px;margin-left:2px}
+.nav-pill.active{background:#fff;box-shadow:0 8px 20px rgba(0,0,0,.08)}
+.logout-btn{
+  font-size:12.5px;color:var(--muted);cursor:pointer;
+  display:flex;align-items:center;gap:6px;
+}
+.logout-btn:hover{color:#B91C1C}
+
+.view{display:none;padding:32px 40px;max-width:1200px;margin:0 auto}
+.view.active{display:block}
+.view h2{font-size:22px;margin:0 0 4px}
+.view p.desc{color:var(--muted);font-size:13.5px;margin:0 0 24px}
+
+.card{
+  position:relative;
+  background:#fff;
+  border-radius: var(--radius);
+  box-shadow: 0 0 14px rgba(0,0,0,.07);
+  padding:26px;
+  overflow:hidden;
+}
+.card + .card{margin-top:20px}
+
+.home-grid{display:flex;flex-wrap:wrap;gap:20px}
+.home-card{
+  width:250px;
+  min-height:190px;
+  background:#fff;
+  border-radius: var(--radius);
+  box-shadow:0 0 14px rgba(0,0,0,.07);
+  padding:24px;
+  cursor:pointer;
+  transition:.3s;
+  display:flex;flex-direction:column;
+}
+.home-card:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(0,0,0,.10)}
+.home-card .icon{
+  width:46px;height:46px;border-radius:14px;
+  background: var(--grad);
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:16px;color:var(--green);font-size:18px;
+}
+.home-card h3{font-size:15px;margin:0 0 6px}
+.home-card p{font-size:12.5px;color:var(--muted);margin:0;line-height:1.5}
+
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{
+  text-align:left;color:#6b7280;font-weight:600;font-size:11.5px;
+  text-transform:uppercase;letter-spacing:.03em;
+  padding:10px 12px;border-bottom:1px solid #eee;
+}
+td{padding:12px;border-bottom:1px solid #f3f4f6}
+tr:last-child td{border-bottom:none}
+.badge{
+  display:inline-block;padding:3px 10px;border-radius:20px;
+  font-size:11.5px;font-weight:600;
+}
+.badge.ok{background:#DCFCE7;color:#166534}
+.badge.warn{background:#FEF3C7;color:#92400E}
+.badge.late{background:#FEE2E2;color:#991B1B}
+.badge.info{background:#E0F2FE;color:#075985}
+
+/* Sub-tabs (Bodega: Entrada / Stock / Salida) */
+.subtabs{display:flex;gap:8px;margin-bottom:20px}
+.subtab{
+  padding:9px 18px;border-radius:14px;font-size:13.5px;font-weight:600;
+  color:var(--muted);cursor:pointer;background:#fff;box-shadow:0 0 10px rgba(0,0,0,.06);
+  display:flex;align-items:center;gap:8px;transition:.2s;
+}
+.subtab:hover{color:var(--text)}
+.subtab.active{background:var(--green);color:#fff;box-shadow:none}
+.subview{display:none}
+.subview.active{display:block}
+
+/* Fila de OC expandible (detalle por artículo) */
+.oc-row{cursor:pointer}
+.oc-row:hover{background:#F8FAFC}
+.oc-chevron{font-size:10px;color:var(--muted);margin-right:8px;transition:.2s transform;display:inline-block}
+.oc-chevron.open{transform:rotate(90deg)}
+.oc-detail td{border-bottom:none;padding:0 12px 16px}
+.oc-detail-wrap{background:#F8FAFC;border-radius:16px;padding:14px 16px}
+.oc-detail-title{font-size:12px;color:var(--muted);margin:0 0 10px;font-weight:600}
+.oc-detail-hint{font-weight:400;font-style:italic}
+.oc-detail-table{width:100%;border-collapse:collapse;font-size:12.5px}
+.oc-detail-table th{padding:6px 10px;font-size:10.5px}
+.oc-detail-table td{padding:8px 10px;border-bottom:1px solid #eee;background:#fff}
+.oc-detail-table tr:last-child td{border-bottom:1px solid #eee}
+.oc-linea-num{color:var(--muted)}
+.oc-linea-cat{font-size:11px;color:var(--muted)}
+
+.search-row{display:flex;gap:10px;margin-bottom:18px}
+.search-row input{
+  flex:1;max-width:320px;padding:10px 14px;border-radius:14px;
+  border:1px solid #e5e7eb;font-size:13.5px;
+}
+
+/* Upload module */
+.dropzone{
+  border:2px dashed #d7dbe0;
+  border-radius:24px;
+  padding:44px 20px;
+  text-align:center;
+  color:var(--muted);
+  cursor:pointer;
+  transition:.25s;
+}
+.dropzone:hover, .dropzone.drag{border-color:var(--green);background:#f4fff8}
+.dropzone i{font-size:26px;color:var(--green);margin-bottom:10px;display:block}
+.upload-btn{
+  background:var(--green);color:#fff;border:none;padding:10px 20px;
+  border-radius:14px;font-size:13px;font-weight:600;cursor:pointer;margin-top:14px;
+}
+.upload-btn:hover{background:var(--green-hover)}
+.progress-wrap{margin-top:18px;display:none}
+.progress-bar-bg{height:8px;background:#eee;border-radius:6px;overflow:hidden}
+.progress-bar-fill{height:100%;width:0%;background:var(--green);transition:.15s}
+.upload-status{font-size:12.5px;color:var(--muted);margin-top:8px}
+.upload-result{
+  display:none;margin-top:18px;background:#F0FDF4;border:1px solid #BBF7D0;
+  border-radius:16px;padding:16px 18px;font-size:13px;
+}
+.upload-result b{color:#166534}
+
+.note{font-size:11.5px;color:var(--muted);margin-top:18px;font-style:italic}
+
+/* Modal (carga de datos) */
+.modal-overlay{
+  display:none;position:fixed;inset:0;background:rgba(15,23,42,.45);
+  align-items:center;justify-content:center;z-index:50;
+}
+.modal-overlay.show{display:flex}
+.modal-box{
+  background:#fff;border-radius:26px;padding:28px 30px;width:420px;max-width:90vw;
+  box-shadow:0 30px 60px rgba(0,0,0,.2);
+}
+.modal-box input[type=text]{
+  width:100%;padding:12px 14px;border-radius:14px;
+  border:1px solid rgba(0,0,0,.08);margin-bottom:12px;font-size:14px;background:#fafafa;
+}
+.modal-box select{
+  width:100%;padding:12px 14px;border-radius:14px;
+  border:1px solid rgba(0,0,0,.08);margin-bottom:12px;font-size:14px;background:#fafafa;
+  color:var(--text);appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;background-size:16px;
+}
+.proveedores-actions{display:flex;gap:10px;align-items:center}
+.proveedores-actions span{font-size:12.5px;color:var(--green);font-weight:600;cursor:pointer}
+
+/* Autocompletado de proveedor */
+.autocomplete-list{
+  display:none;position:absolute;left:0;right:0;top:calc(100% - 6px);
+  background:#fff;border-radius:14px;box-shadow:0 14px 30px rgba(0,0,0,.14);
+  max-height:200px;overflow-y:auto;z-index:5;padding:6px;
+}
+.autocomplete-list.show{display:block}
+.autocomplete-item{
+  padding:9px 12px;border-radius:10px;cursor:pointer;font-size:13.5px;
+}
+.autocomplete-item:hover, .autocomplete-item.hl{background:#F0FDF4}
+.autocomplete-item small{display:block;color:var(--muted);font-size:11px;margin-top:1px}
+
+.proveedor-info{
+  background:#F8FAFC;border:1px solid #eee;border-radius:16px;
+  padding:12px 16px;margin:-2px 0 14px;font-size:12.5px;
+}
+.proveedor-info .row{display:flex;justify-content:space-between;padding:3px 0;color:var(--muted)}
+.proveedor-info .row b{color:var(--text);font-weight:600}
+
+/* Bolsa de presupuesto (Reportes) */
+.bolsa-card{
+  width:260px;background:#fff;border-radius:22px;
+  box-shadow:0 0 14px rgba(0,0,0,.07);padding:18px 20px;
+}
+.bolsa-card h4{margin:0 0 2px;font-size:14px}
+.bolsa-card .cod{font-size:11px;color:var(--muted);margin-bottom:12px}
+.bolsa-bar-bg{height:8px;background:#eee;border-radius:6px;overflow:hidden;margin-bottom:8px}
+.bolsa-bar-fill{height:100%;background:var(--green)}
+.bolsa-bar-fill.warn{background:#D97706}
+.bolsa-bar-fill.danger{background:#DC2626}
+.bolsa-nums{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted)}
+.bolsa-nums b{color:var(--text);font-size:12.5px}
+
+/* Bolsa de presupuesto grande y amigable (modal Buscar OC) — se recalcula
+   sola apenas cambia el centro de costo o la categoría. */
+.bolsa-card-lg{
+  border-radius:22px;padding:20px 22px;background:#F8FAFC;
+  border:1px solid #eee;transition:background .2s,border-color .2s;
+}
+.bolsa-card-lg.warn{background:#FFFBEB;border-color:#FDE68A}
+.bolsa-card-lg.danger{background:#FEF2F2;border-color:#FECACA}
+.bolsa-lg-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:14px}
+.bolsa-lg-head h4{margin:0 0 3px;font-size:16px}
+.bolsa-lg-head .cod{font-size:12px;color:var(--muted)}
+.bolsa-lg-pct{font-size:30px;font-weight:800;color:var(--green);line-height:1}
+.bolsa-lg-pct.warn{color:#D97706}
+.bolsa-lg-pct.danger{color:#DC2626}
+.bolsa-bar-bg-lg{height:14px;border-radius:8px}
+.bolsa-lg-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
+.bolsa-lg-stats > div{background:#fff;border-radius:14px;padding:10px 12px}
+.bolsa-lg-stats span{display:block;font-size:11px;color:var(--muted);margin-bottom:2px}
+.bolsa-lg-stats b{font-size:14px}
+
+/* Chips de OC de ejemplo (modal Buscar OC) */
+.oc-chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 4px}
+.oc-chip{
+  background:#F8FAFC;border:1px solid #eee;border-radius:20px;padding:6px 12px;
+  font-size:11.5px;color:var(--muted);cursor:pointer;transition:.15s;
+}
+.oc-chip:hover{background:#F0FDF4;border-color:#BBF7D0;color:var(--green)}
+.oc-chips-hint{font-size:11px;color:var(--muted);font-style:italic;margin:0 0 4px}
+
+/* Toggle "Automático" (sincronización con i10) junto a Registrar guía */
+.auto-toggle{display:flex;align-items:center;gap:9px;cursor:pointer;user-select:none}
+.auto-toggle input{display:none}
+.auto-toggle-track{
+  width:34px;height:20px;border-radius:999px;background:#D1D5DB;
+  position:relative;transition:.2s;flex-shrink:0;
+}
+.auto-toggle-thumb{
+  position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;
+  background:#fff;transition:.2s;box-shadow:0 1px 2px rgba(0,0,0,.25);
+}
+.auto-toggle input:checked + .auto-toggle-track{background:var(--green)}
+.auto-toggle input:checked + .auto-toggle-track .auto-toggle-thumb{left:16px}
+.auto-toggle-label{font-size:12.5px;font-weight:600;color:#111827}
+.auto-toggle-note{font-size:11.5px;color:var(--muted);margin:0 0 12px}
+.auto-toggle-note.paused{color:#92400E}
+
+.sim-box{
+  border-radius:18px;padding:16px 18px;font-size:13px;
+}
+.sim-box.ok{background:#F0FDF4;border:1px solid #BBF7D0}
+.sim-box.warn{background:#FFFBEB;border:1px solid #FDE68A}
+.sim-box.danger{background:#FEF2F2;border:1px solid #FECACA}
+
+/* Fila dinámica de categoría dentro de "Nuevo centro de costo" */
+.centro-cat-row{
+  display:flex;gap:8px;align-items:center;margin-bottom:8px;
+}
+.centro-cat-row input{margin-bottom:0}
+.centro-cat-row .centro-cat-nombre{flex:1.3;min-width:0}
+.centro-cat-row .centro-cat-monto{flex:1;min-width:0}
+.centro-cat-remove{
+  width:28px;height:28px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--muted);cursor:pointer;transition:.2s;
+}
+.centro-cat-remove:hover{background:#FEE2E2;color:#B91C1C}
+
+/* Aviso: demo pensada para pantalla de computador */
+#mobile-warning{
+  display:none;position:fixed;top:0;left:0;right:0;z-index:200;
+  background:var(--text);color:#fff;padding:10px 44px 10px 18px;
+  font-size:12.5px;align-items:center;justify-content:center;gap:10px;
+  text-align:center;line-height:1.4;
+}
+#mobile-warning .close{
+  position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  cursor:pointer;opacity:.75;flex-shrink:0;
+}
+#mobile-warning .close:hover{opacity:1}
+@media (max-width:900px){
+  #mobile-warning:not(.dismissed){display:flex}
+}
+
+.svgi{width:1em;height:1em;display:inline-block;vertical-align:-0.15em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+.nav-pill .svgi{width:18px;height:18px}
+.home-card .svgi{width:20px;height:20px;color:var(--green)}
+.dropzone .svgi{width:26px;height:26px;color:var(--green);margin:0 auto 10px;display:block}
+.logout-btn .svgi{width:14px;height:14px}
+.nav-back-btn .svgi{width:16px;height:16px}
+
+</style>
 </head>
 <body>
 <svg style="display:none" aria-hidden="true"><symbol id="i-house" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></symbol>
@@ -582,6 +977,1418 @@
   </section>
 </div>
 
-<script src="script.js"></script>
+<script>
+// ============ DATOS DE EJEMPLO (hardcodeados, solo para la demo) ============
+const OCS = [
+  { num: "19023", proveedor: "Distribuidora Andina S.A.", producto: "Cosmopolitan FD OX Plata 1A", monto: "$1.832.069", estado: "Pendiente de aprobación", badge: "warn" },
+  { num: "18892", proveedor: "Cerámicas Cordillera Ltda.", producto: "Porcelanato Cosmopolitan", monto: "$2.410.500", estado: "Aprobada", badge: "ok" },
+  { num: "18877", proveedor: "Refrigeración del Sur SpA", producto: "Vitrina refrigerada 2 puertas", monto: "$3.150.000", estado: "En Oracle EBS", badge: "info" },
+  { num: "18801", proveedor: "Insumos Perecibles Ñuble", producto: "Insumo perecible ejemplo", monto: "$412.300", estado: "Rechazada", badge: "late" },
+  { num: "18754", proveedor: "Hornos Industriales Chile", producto: "Horno industrial 2 bandejas", monto: "$4.980.000", estado: "Aprobada", badge: "ok" },
+];
+
+// Detalle por artículo de cada OC (línea por línea) — mismo formato que entrega
+// Oracle en el reporte de compras, con datos de ejemplo inventados para la demo.
+const LINEAS_OC = {
+  "19023": [
+    { linea: 1, articulo: "HB-2201", categoria: "Habilitadores (imagen)", descripcion: "Cosmopolitan FD OX Plata 1A", cantidad: 100, udm: "UNIDAD", precio: 14320, importe: 1432000 },
+    { linea: 2, articulo: "HB-2205", categoria: "Habilitadores (imagen)", descripcion: "Instalación y fijaciones", cantidad: 1, udm: "SERVICIO", precio: 400069, importe: 400069 },
+  ],
+  "18892": [
+    { linea: 1, articulo: "GN-3110", categoria: "General / otros", descripcion: "Porcelanato Cosmopolitan 60x60", cantidad: 190, udm: "M2", precio: 12000, importe: 2280000 },
+    { linea: 2, articulo: "GN-3115", categoria: "General / otros", descripcion: "Flete y despacho a sucursal", cantidad: 1, udm: "SERVICIO", precio: 130500, importe: 130500 },
+  ],
+  "18877": [
+    { linea: 1, articulo: "RF-1042", categoria: "Refrigeración", descripcion: "Vitrina refrigerada 2 puertas", cantidad: 1, udm: "UNIDAD", precio: 2950000, importe: 2950000 },
+    { linea: 2, articulo: "RF-1043", categoria: "Refrigeración", descripcion: "Instalación y puesta en marcha", cantidad: 1, udm: "SERVICIO", precio: 200000, importe: 200000 },
+  ],
+  "18801": [
+    { linea: 1, articulo: "GN-5501", categoria: "General / otros", descripcion: "Insumo perecible ejemplo", cantidad: 40, udm: "CAJA", precio: 10307.5, importe: 412300 },
+  ],
+  "18754": [
+    { linea: 1, articulo: "GN-6010", categoria: "General / otros", descripcion: "Horno industrial 2 bandejas", cantidad: 2, udm: "UNIDAD", precio: 2390000, importe: 4780000 },
+    { linea: 2, articulo: "GN-6015", categoria: "General / otros", descripcion: "Instalación y certificación gas", cantidad: 1, udm: "SERVICIO", precio: 200000, importe: 200000 },
+  ],
+};
+
+// Lotes de compra por producto (uno o más por producto) — cada lote trae la OC
+// que lo generó, la fecha de compra y la sucursal de destino, para poder ver
+// para qué centro es cada uno y en qué orden corresponde usarlos (FIFO: el
+// lote más antiguo se usa primero). Datos de ejemplo inventados para la demo.
+const LOTES_ACTIVO = {
+  "Horno industrial 2 bandejas": [
+    { oc: "17890", fecha: "02-mar-2026", cantidad: 1, udm: "UNIDAD", precio: 2150000, proveedor: "Hornos Industriales Chile", sucursal: "Sucursal OXXO Centro", vence: null },
+    { oc: "18754", fecha: "10-ago-2026", cantidad: 2, udm: "UNIDAD", precio: 2390000, proveedor: "Hornos Industriales Chile", sucursal: "Sucursal OXXO Sur", vence: null },
+  ],
+  "Vitrina refrigerada": [
+    { oc: "17650", fecha: "18-may-2026", cantidad: 2, udm: "UNIDAD", precio: 1500000, proveedor: "Refrigeración del Sur SpA", sucursal: "Bodega central", vence: null },
+  ],
+  "Porcelanato Cosmopolitan": [
+    { oc: "18210", fecha: "13-jul-2026", cantidad: 197.4, udm: "M2", precio: 11500, proveedor: "Cerámicas Cordillera Ltda.", sucursal: "Bodega central", vence: null },
+  ],
+  "Insumo perecible ejemplo": [
+    { oc: "17210", fecha: "22-jul-2026", cantidad: 40, udm: "CAJA", precio: 9800, proveedor: "Insumos Perecibles Ñuble", sucursal: "Sucursal OXXO Centro", vence: "20-sep-2026" },
+  ],
+};
+
+// Salidas de bodega ya despachadas — dataset propio (no se resta automáticamente
+// del stock de arriba; es solo para mostrar el tab "Salida" con datos de ejemplo).
+const SALIDAS_BODEGA = [
+  { fecha: "12-ago-2026", documento: "SAL-0231", producto: "Horno industrial 2 bandejas", cantidad: 1, udm: "UNIDAD", precio: 2390000, sucursal: "Sucursal OXXO Sur", motivo: "Instalación en sucursal", responsable: "Arias Rojas, Roberto Carlos" },
+  { fecha: "22-may-2026", documento: "SAL-0198", producto: "Vitrina refrigerada", cantidad: 1, udm: "UNIDAD", precio: 1500000, sucursal: "Sucursal OXXO Providencia", motivo: "Instalación en sucursal", responsable: "Arias Rojas, Roberto Carlos" },
+  { fecha: "02-ago-2026", documento: "SAL-0225", producto: "Insumo perecible ejemplo", cantidad: 10, udm: "CAJA", precio: 9800, sucursal: "Sucursal OXXO Centro", motivo: "Despacho a sucursal", responsable: "Arias Rojas, Roberto Carlos" },
+  { fecha: "16-ago-2026", documento: "SAL-0229", producto: "Insumo perecible ejemplo", cantidad: 5, udm: "CAJA", precio: 9800, sucursal: "Sucursal OXXO Sur", motivo: "Despacho a sucursal", responsable: "Arias Rojas, Roberto Carlos" },
+];
+
+const FACTURAS = [
+  { num: "F-4521", proveedor: "Distribuidora Andina S.A.", oc: "19023", sucursal: "Sucursal OXXO Centro", emision: "18-ago-2026", monto: "$1.832.069", venc: "28-ago-2026", estado: "Pagada", badge: "ok", nc: null },
+  { num: "F-4498", proveedor: "Cerámicas Cordillera Ltda.", oc: "18892", sucursal: "Bodega central", emision: "23-ago-2026", monto: "$2.410.500", venc: "02-sep-2026", estado: "Por vencer", badge: "warn", nc: { tipo: "Crédito", num: "NC-1032", monto: 150000 } },
+  { num: "F-4470", proveedor: "Refrigeración del Sur SpA", oc: "18877", sucursal: "Bodega central", emision: "09-ago-2026", monto: "$3.150.000", venc: "19-ago-2026", estado: "Vencida", badge: "late", nc: null },
+  { num: "F-4432", proveedor: "Hornos Industriales Chile", oc: "18754", sucursal: "Sucursal OXXO Sur", emision: "20-ago-2026", monto: "$4.980.000", venc: "30-ago-2026", estado: "Pagada", badge: "ok", nc: { tipo: "Débito", num: "ND-0087", monto: 60000 } },
+];
+
+// Movimientos de bodega generados automáticamente hoy — al registrar una guía
+// (o llegar sincronizado desde i10), el stock se mueve solo, y si la OC ya
+// quedó vinculada a un centro de costo (paso manual único, ver Compras), la
+// bolsa de presupuesto se descuenta sin que nadie lo haga a mano. Datos de
+// ejemplo inventados para la demo.
+const MOVIMIENTOS_HOY = [
+  { hora: "08:14", tipo: "entrada", producto: "Porcelanato Cosmopolitan 60x60", cantidad: 190, udm: "M2", guia: "GD-33210", oc: "18892", origen: "i10", centroId: "CC-001", catCod: "GN", monto: 2280000 },
+  { hora: "09:40", tipo: "salida", producto: "Insumo perecible ejemplo", cantidad: 5, udm: "CAJA", guia: "GD-33244", oc: null, origen: "Manual", sucursal: "Sucursal OXXO Sur" },
+  { hora: "11:02", tipo: "entrada", producto: "Vitrina refrigerada 2 puertas", cantidad: 1, udm: "UNIDAD", guia: "GD-33251", oc: "18877", origen: "i10", centroId: "CC-002", catCod: "RF", monto: 3150000 },
+];
+
+const APROBACIONES = [
+  { num: "19023", enviada: "24-ago 09:12", resuelta: "—", tiempo: "1d 6h (en curso)", estado: "Pendiente de aprobación", badge: "warn" },
+  { num: "18892", enviada: "20-ago 11:40", resuelta: "20-ago 14:05", tiempo: "2h 25m", estado: "Aprobada", badge: "ok" },
+  { num: "18877", enviada: "18-ago 08:55", resuelta: "18-ago 10:10", tiempo: "1h 15m", estado: "Aprobada", badge: "ok" },
+  { num: "18801", enviada: "15-ago 16:20", resuelta: "17-ago 09:00", tiempo: "1d 16h 40m", estado: "Rechazada", badge: "late" },
+  { num: "18754", enviada: "10-ago 10:00", resuelta: "10-ago 11:30", tiempo: "1h 30m", estado: "Aprobada", badge: "ok" },
+];
+
+// Centros de costo (ej. sucursales nuevas) → cada uno con su bolsa de valores
+// dividida en categorías de artículo (propuesta a validar con OXXO)
+const CENTROS_COSTO = [
+  {
+    id: "CC-001",
+    nombre: "Sucursal Nueva — Talca Centro",
+    categorias: [
+      { cod: "RF", nombre: "Refrigeración", asignado: 8000000, consumido: 5230000 },
+      { cod: "HB", nombre: "Habilitadores (imagen)", asignado: 5000000, consumido: 4100000 },
+      { cod: "GN", nombre: "General / otros", asignado: 7000000, consumido: 3900000 },
+    ],
+  },
+  {
+    id: "CC-002",
+    nombre: "Sucursal Nueva — Curicó Oriente",
+    categorias: [
+      { cod: "RF", nombre: "Refrigeración", asignado: 6000000, consumido: 1200000 },
+      { cod: "HB", nombre: "Habilitadores (imagen)", asignado: 4000000, consumido: 800000 },
+      { cod: "GN", nombre: "General / otros", asignado: 5000000, consumido: 500000 },
+    ],
+  },
+];
+function centroPresupuesto(c) { return c.categorias.reduce((s, x) => s + x.asignado, 0); }
+function centroConsumido(c) { return c.categorias.reduce((s, x) => s + x.consumido, 0); }
+
+// Maestro de proveedores (datos de pago de ejemplo, solo para la demo)
+const PROVEEDORES = [
+  { nombre: "Distribuidora Andina S.A.", rut: "76.123.456-7", categoria: "Habilitadores (imagen)", banco: "Banco Estado", tipoCuenta: "Cuenta corriente", cuenta: "00-812-345671-1", condicionPago: "30 días", estado: "Activo" },
+  { nombre: "Cerámicas Cordillera Ltda.", rut: "77.234.567-8", categoria: "General / otros", banco: "Banco de Chile", tipoCuenta: "Cuenta corriente", cuenta: "00-119-882345-K", condicionPago: "Contado", estado: "Activo" },
+  { nombre: "Refrigeración del Sur SpA", rut: "76.345.678-9", categoria: "Refrigeración", banco: "Banco BCI", tipoCuenta: "Cuenta corriente", cuenta: "00-734-556781-3", condicionPago: "45 días", estado: "Activo" },
+  { nombre: "Insumos Perecibles Ñuble", rut: "77.456.789-0", categoria: "General / otros", banco: "Banco Santander", tipoCuenta: "Cuenta vista", cuenta: "00-041-229981-7", condicionPago: "Contado", estado: "Activo" },
+  { nombre: "Hornos Industriales Chile", rut: "76.567.890-1", categoria: "General / otros", banco: "Banco Itaú", tipoCuenta: "Cuenta corriente", cuenta: "00-556-113420-9", condicionPago: "30 días", estado: "Activo" },
+  { nombre: "Habilitadores Retail Ltda.", rut: "77.678.901-2", categoria: "Habilitadores (imagen)", banco: "Banco Scotiabank", tipoCuenta: "Cuenta corriente", cuenta: "00-902-774112-5", condicionPago: "60 días", estado: "Inactivo" },
+];
+
+// ============ LOGIN ============
+const loginForm = document.getElementById("login-form");
+const loginError = document.getElementById("login-error");
+
+loginForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const user = document.getElementById("login-user").value.trim();
+  const pass = document.getElementById("login-pass").value.trim();
+  if (user === "demo" && pass === "demo123") {
+    document.getElementById("login-screen").style.display = "none";
+    document.getElementById("app").style.display = "block";
+    loginError.style.display = "none";
+  } else {
+    loginError.style.display = "block";
+  }
+});
+
+document.getElementById("logout-btn").addEventListener("click", () => {
+  document.getElementById("app").style.display = "none";
+  document.getElementById("login-screen").style.display = "flex";
+  viewHistory = [];
+  currentView = "inicio";
+  document.querySelectorAll(".nav-pill").forEach(p => p.classList.toggle("active", p.dataset.view === "inicio"));
+  document.querySelectorAll(".view").forEach(v => v.classList.toggle("active", v.id === "view-inicio"));
+  updateBackBtn();
+});
+
+// ============ NAVEGACION ============
+let currentView = "inicio";
+let viewHistory = [];
+const navBackBtn = document.getElementById("nav-back-btn");
+
+function updateBackBtn() {
+  if (!navBackBtn) return;
+  navBackBtn.classList.toggle("disabled", viewHistory.length === 0);
+}
+function goToView(name, opts = {}) {
+  if (name === currentView) return;
+  if (!opts.skipHistory) viewHistory.push(currentView);
+  currentView = name;
+  document.querySelectorAll(".nav-pill").forEach(p => p.classList.toggle("active", p.dataset.view === name));
+  document.querySelectorAll(".view").forEach(v => v.classList.toggle("active", v.id === "view-" + name));
+  updateBackBtn();
+}
+function goBack() {
+  if (!viewHistory.length) return;
+  const prev = viewHistory.pop();
+  goToView(prev, { skipHistory: true });
+}
+navBackBtn?.addEventListener("click", goBack);
+updateBackBtn();
+
+document.querySelectorAll(".nav-pill").forEach(pill => {
+  pill.addEventListener("click", () => goToView(pill.dataset.view));
+});
+document.querySelectorAll(".home-card").forEach(card => {
+  card.addEventListener("click", () => goToView(card.dataset.goto));
+});
+
+// ============ RENDER TABLAS ============
+function renderOCs(list) {
+  const tbody = document.querySelector("#oc-table tbody");
+  tbody.innerHTML = list.map(oc => {
+    const lineas = LINEAS_OC[oc.num] || [];
+    const detailRows = lineas.map(l => `
+      <tr>
+        <td class="oc-linea-num">${l.linea}</td>
+        <td>${l.articulo}<br><span class="oc-linea-cat">${l.categoria}</span></td>
+        <td>${l.descripcion}</td>
+        <td>${l.cantidad} ${l.udm}</td>
+        <td>${fmtCLP(l.importe)}</td>
+      </tr>
+    `).join("");
+    return `
+      <tr class="oc-row" data-oc="${oc.num}">
+        <td><svg class="svgi oc-chevron" viewBox="0 0 24 24"><use href="#i-chevron-right"/></svg> <b>${oc.num}</b></td>
+        <td>${oc.proveedor}</td>
+        <td>${oc.producto}</td>
+        <td>${oc.monto}</td>
+        <td><span class="badge ${oc.badge}">${oc.estado}</span></td>
+      </tr>
+      <tr class="oc-detail" data-oc-detail="${oc.num}" style="display:none">
+        <td colspan="5">
+          <div class="oc-detail-wrap">
+            <p class="oc-detail-title">Detalle por artículo <span class="oc-detail-hint">— mismo formato que entrega Oracle</span></p>
+            <table class="oc-detail-table">
+              <thead><tr><th>Línea</th><th>Artículo</th><th>Descripción</th><th>Cant.</th><th>Importe</th></tr></thead>
+              <tbody>${detailRows}</tbody>
+            </table>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join("");
+
+  tbody.querySelectorAll(".oc-row").forEach(row => {
+    row.addEventListener("click", () => {
+      const num = row.dataset.oc;
+      const detail = tbody.querySelector(`.oc-detail[data-oc-detail="${num}"]`);
+      const chevron = row.querySelector(".oc-chevron");
+      const isOpen = detail.style.display !== "none";
+      detail.style.display = isOpen ? "none" : "table-row";
+      chevron.classList.toggle("open", !isOpen);
+    });
+  });
+}
+renderOCs(OCS);
+
+document.getElementById("oc-search").addEventListener("input", (e) => {
+  const q = e.target.value.toLowerCase();
+  renderOCs(OCS.filter(oc =>
+    oc.num.toLowerCase().includes(q) ||
+    oc.proveedor.toLowerCase().includes(q) ||
+    oc.producto.toLowerCase().includes(q)
+  ));
+});
+
+const MESES_CORTOS = { ene:0, feb:1, mar:2, abr:3, may:4, jun:5, jul:6, ago:7, sep:8, oct:9, nov:10, dic:11 };
+function parseFechaCorta(s) {
+  if (!s) return null;
+  const [d, mAbbr, y] = s.split("-");
+  return new Date(parseInt(y, 10), MESES_CORTOS[mAbbr.toLowerCase()], parseInt(d, 10));
+}
+function fmtCantidad(cantidad, udm) {
+  const unidad = udm === "M2" ? "m²" : udm.toLowerCase();
+  const cantTxt = typeof cantidad === "number" ? cantidad.toLocaleString("es-CL") : cantidad;
+  return `${cantTxt} ${unidad}`;
+}
+function calcValor(cantidad, precio) {
+  const neto = cantidad * precio;
+  return { neto, iva: neto * 0.19, total: neto * 1.19 };
+}
+
+// ============ BODEGA: ENTRADA / STOCK / SALIDA (sub-tabs) ============
+document.querySelectorAll("#bodega-subtabs .subtab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll("#bodega-subtabs .subtab").forEach(t => t.classList.toggle("active", t === tab));
+    const key = tab.dataset.subview;
+    document.querySelectorAll("#view-activos .subview").forEach(v => v.classList.toggle("active", v.id === "subview-" + key));
+  });
+});
+
+function renderEntradaBodega() {
+  const tbody = document.querySelector("#entrada-table tbody");
+  const rows = [];
+  Object.entries(LOTES_ACTIVO).forEach(([producto, lotes]) => {
+    lotes.forEach(l => rows.push({ producto, ...l }));
+  });
+  rows.sort((a, b) => parseFechaCorta(a.fecha) - parseFechaCorta(b.fecha));
+  tbody.innerHTML = rows.map(r => {
+    const { neto, iva, total } = calcValor(r.cantidad, r.precio);
+    return `
+      <tr>
+        <td>${r.fecha}</td>
+        <td><b>${r.oc}</b></td>
+        <td>${r.proveedor}</td>
+        <td>${r.producto}</td>
+        <td>${fmtCantidad(r.cantidad, r.udm)}</td>
+        <td>${fmtCLP(r.precio)}</td>
+        <td>${fmtCLP(neto)}</td>
+        <td>${fmtCLP(iva)}</td>
+        <td>${fmtCLP(total)}</td>
+        <td>${r.sucursal}</td>
+      </tr>
+    `;
+  }).join("");
+}
+renderEntradaBodega();
+
+function renderActivos() {
+  const tbody = document.querySelector("#activos-table tbody");
+  const productos = Object.keys(LOTES_ACTIVO);
+  tbody.innerHTML = productos.map((producto, idx) => {
+    const lotes = [...LOTES_ACTIVO[producto]].sort((a, b) => parseFechaCorta(a.fecha) - parseFechaCorta(b.fecha));
+    const cantidadTotal = lotes.reduce((s, l) => s + l.cantidad, 0);
+    const valorTotal = lotes.reduce((s, l) => s + calcValor(l.cantidad, l.precio).total, 0);
+    const sucursales = [...new Set(lotes.map(l => l.sucursal))];
+    const sucursalTxt = sucursales.length === 1 ? sucursales[0] : `${sucursales.length} sucursales`;
+    const vences = lotes.filter(l => l.vence).sort((a, b) => parseFechaCorta(a.vence) - parseFechaCorta(b.vence));
+    const proxVence = vences.length ? vences[0].vence : "—";
+
+    const detailRows = lotes.map((l, i) => {
+      const { total } = calcValor(l.cantidad, l.precio);
+      return `
+      <tr>
+        <td><b>${l.oc}</b></td>
+        <td>${l.fecha}</td>
+        <td>${fmtCantidad(l.cantidad, l.udm)}</td>
+        <td>${fmtCLP(l.precio)}</td>
+        <td>${fmtCLP(total)}</td>
+        <td>${l.sucursal}</td>
+        <td>${l.vence || "—"}</td>
+        <td>${i === 0 ? '<span class="badge ok">Usar primero (FIFO)</span>' : '<span class="badge info">En reserva</span>'}</td>
+      </tr>
+    `;
+    }).join("");
+
+    return `
+      <tr class="oc-row" data-idx="${idx}">
+        <td><svg class="svgi oc-chevron" viewBox="0 0 24 24"><use href="#i-chevron-right"/></svg> ${producto}</td>
+        <td>${fmtCantidad(cantidadTotal, lotes[0].udm)}</td>
+        <td>${sucursalTxt}</td>
+        <td>${fmtCLP(valorTotal)}</td>
+        <td>${lotes.length > 1 ? `<span class="badge info">${lotes.length} lotes</span>` : '<span class="badge ok">1 lote</span>'}</td>
+      </tr>
+      <tr class="oc-detail" data-detail-idx="${idx}" style="display:none">
+        <td colspan="5">
+          <div class="oc-detail-wrap">
+            <p class="oc-detail-title">Lotes de compra <span class="oc-detail-hint">— orden FIFO: el más antiguo se usa primero</span></p>
+            <table class="oc-detail-table">
+              <thead><tr><th>N° OC</th><th>Fecha compra</th><th>Cantidad</th><th>Precio unit.</th><th>Total</th><th>Sucursal</th><th>Vencim.</th><th>Prioridad</th></tr></thead>
+              <tbody>${detailRows}</tbody>
+            </table>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join("");
+
+  tbody.querySelectorAll(".oc-row").forEach(row => {
+    row.addEventListener("click", () => {
+      const idx = row.dataset.idx;
+      const detail = tbody.querySelector(`.oc-detail[data-detail-idx="${idx}"]`);
+      const chevron = row.querySelector(".oc-chevron");
+      const isOpen = detail.style.display !== "none";
+      detail.style.display = isOpen ? "none" : "table-row";
+      chevron.classList.toggle("open", !isOpen);
+    });
+  });
+}
+renderActivos();
+
+function renderSalidaBodega() {
+  const tbody = document.querySelector("#salida-table tbody");
+  tbody.innerHTML = SALIDAS_BODEGA.map(s => {
+    const { total } = calcValor(s.cantidad, s.precio);
+    return `
+      <tr>
+        <td>${s.fecha}</td>
+        <td><b>${s.documento}</b></td>
+        <td>${s.producto}</td>
+        <td>${fmtCantidad(s.cantidad, s.udm)}</td>
+        <td>${s.sucursal}</td>
+        <td>${s.motivo}</td>
+        <td>${fmtCLP(total)}</td>
+      </tr>
+    `;
+  }).join("");
+}
+renderSalidaBodega();
+
+// ============ MOVIMIENTOS DE HOY (bodega, automático) ============
+function renderMovimientosHoy() {
+  const wrap = document.getElementById("movimientos-hoy-list");
+  if (!wrap) return;
+  wrap.innerHTML = MOVIMIENTOS_HOY.map(m => {
+    const esEntrada = m.tipo === "entrada";
+    const icon = esEntrada ? "i-arrow-down-to-bracket" : "i-arrow-up-from-bracket";
+    const signo = esEntrada ? "+" : "\u2212";
+    const color = esEntrada ? "var(--green)" : "#DC2626";
+    let bolsaLine = "";
+    if (esEntrada && m.centroId && m.catCod) {
+      const centro = CENTROS_COSTO.find(c => c.id === m.centroId);
+      const cat = centro && centro.categorias.find(x => x.cod === m.catCod);
+      if (centro && cat) {
+        bolsaLine = `<div style="font-size:12px;color:var(--muted);margin-top:2px">\u21B3 Se descontó ${fmtCLP(m.monto)} de la bolsa <b>${cat.nombre}</b> — ${centro.nombre} <span style="color:var(--muted)">(automático, OC ya vinculada)</span></div>`;
+      }
+    }
+    return `
+      <div style="display:flex;gap:12px;padding:10px 0;border-top:1px solid #eee">
+        <svg class="svgi" viewBox="0 0 24 24" style="width:18px;height:18px;color:${color};flex-shrink:0;margin-top:2px"><use href="#${icon}"/></svg>
+        <div style="flex:1">
+          <div style="font-size:13px">
+            <span style="color:${color};font-weight:700">${signo}</span>
+            ${fmtCantidad(m.cantidad, m.udm)} — <b>${m.producto}</b>
+            <span style="color:var(--muted)"> · Guía ${m.guia}${m.oc ? ` · OC ${m.oc}` : ""}${m.sucursal ? ` · a ${m.sucursal}` : ""} · ${m.origen}</span>
+          </div>
+          ${bolsaLine}
+        </div>
+        <div style="font-size:12px;color:var(--muted);white-space:nowrap">${m.hora}</div>
+      </div>
+    `;
+  }).join("");
+}
+renderMovimientosHoy();
+
+function montoToNum(m) { return parseInt(String(m).replace(/[^\d]/g, ""), 10) || 0; }
+
+function renderFinanzasResumen() {
+  const card = document.getElementById("finanzas-resumen-card");
+  if (!card) return;
+  const grupos = { "Vencida": 0, "Por vencer": 0, "Pagada": 0 };
+  const badgeByEstado = { "Vencida": "late", "Por vencer": "warn", "Pagada": "ok" };
+  FACTURAS.forEach(f => { grupos[f.estado] = (grupos[f.estado] || 0) + montoToNum(f.monto); });
+  card.innerHTML = `
+    <h3 style="margin:0 0 4px;font-size:15px">Resumen de pagos a proveedores</h3>
+    <p style="font-size:12.5px;color:var(--muted);margin:0 0 16px">Para saber de un vistazo qué urge pagar.</p>
+    <div style="display:flex;gap:16px;flex-wrap:wrap">
+      ${Object.entries(grupos).map(([estado, total]) => `
+        <div style="flex:1;min-width:160px;background:#F8FAFC;border-radius:16px;padding:14px 16px">
+          <span class="badge ${badgeByEstado[estado]}">${estado}</span>
+          <div style="font-size:18px;font-weight:700;margin-top:8px">${fmtCLP(total)}</div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderFinanzas() {
+  const tbody = document.querySelector("#finanzas-table tbody");
+  tbody.innerHTML = FACTURAS.map(f => {
+    const ncHtml = f.nc
+      ? `<span class="badge ${f.nc.tipo === "Crédito" ? "info" : "warn"}">${f.nc.num} · ${f.nc.tipo === "Crédito" ? "-" : "+"}${fmtCLP(f.nc.monto)}</span>`
+      : `<span style="color:var(--muted)">—</span>`;
+    return `
+    <tr>
+      <td><b>${f.num}</b></td>
+      <td>${f.proveedor}</td>
+      <td>${f.oc || "—"}</td>
+      <td>${f.sucursal || "—"}</td>
+      <td>${f.emision || "—"}</td>
+      <td>${f.venc}</td>
+      <td>${f.monto}</td>
+      <td>${ncHtml}</td>
+      <td><span class="badge ${f.badge}">${f.estado}</span></td>
+    </tr>
+  `;
+  }).join("");
+  renderFinanzasResumen();
+}
+renderFinanzas();
+
+// ============ PORTAL DE PROVEEDORES (autoservicio por RUT) ============
+const MESES_CORTOS_ARR = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+function fmtFechaCorta(date) {
+  return `${String(date.getDate()).padStart(2, "0")}-${MESES_CORTOS_ARR[date.getMonth()]}-${date.getFullYear()}`;
+}
+// Ciclo real de pago: cierre de carga los martes, pago los viernes siguiente.
+function proximoViernesDesde(fechaStr) {
+  const d = parseFechaCorta(fechaStr);
+  if (!d) return null;
+  const dia = d.getDay(); // 0=domingo … 5=viernes
+  let diff = (5 - dia + 7) % 7;
+  if (diff === 0) diff = 7;
+  const viernes = new Date(d);
+  viernes.setDate(d.getDate() + diff);
+  return fmtFechaCorta(viernes);
+}
+function normalizarRut(s) {
+  return String(s || "").replace(/[.\-\s]/g, "").toUpperCase();
+}
+function buscarProveedorPorRut(rut) {
+  const norm = normalizarRut(rut);
+  return PROVEEDORES.find(p => normalizarRut(p.rut) === norm);
+}
+function renderPortalResultado(rutInput) {
+  const prov = buscarProveedorPorRut(rutInput);
+  const errorEl = document.getElementById("portal-error");
+  const resEl = document.getElementById("portal-resultado");
+  if (!prov) {
+    errorEl.style.display = "block";
+    resEl.style.display = "none";
+    return;
+  }
+  errorEl.style.display = "none";
+  const facturas = FACTURAS.filter(f => f.proveedor === prov.nombre);
+  const filas = facturas.map(f => {
+    const montoNum = montoToNum(f.monto);
+    const pagada = f.estado === "Pagada";
+    const montoPagado = pagada ? montoNum : 0;
+    const diaPago = pagada
+      ? proximoViernesDesde(f.venc)
+      : `<span style="color:var(--muted)">Próx. pago: ${proximoViernesDesde(f.venc)}</span>`;
+    return `
+      <tr>
+        <td><b>${f.num}</b></td>
+        <td>${f.emision || "—"}</td>
+        <td>${f.venc}</td>
+        <td>${fmtCLP(montoNum)}</td>
+        <td>${fmtCLP(montoPagado)}</td>
+        <td>${diaPago}</td>
+        <td><span class="badge ${f.badge}">${f.estado}</span></td>
+      </tr>`;
+  }).join("");
+  resEl.innerHTML = `
+    <p style="font-size:12.5px;color:var(--muted);margin:0 0 10px"><b style="color:var(--text)">${prov.nombre}</b> · RUT ${prov.rut}</p>
+    <table class="oc-detail-table">
+      <thead><tr><th>N° Factura</th><th>Emisión</th><th>Vencim.</th><th>Monto total</th><th>Monto pagado</th><th>Día de pago</th><th>Estado</th></tr></thead>
+      <tbody>${filas || `<tr><td colspan="7" style="color:var(--muted)">Este proveedor no tiene facturas registradas todavía.</td></tr>`}</tbody>
+    </table>
+  `;
+  resEl.style.display = "block";
+}
+document.getElementById("portal-rut-btn")?.addEventListener("click", () => {
+  const rut = document.getElementById("portal-rut-input").value.trim();
+  if (!rut) return;
+  renderPortalResultado(rut);
+});
+document.getElementById("portal-rut-input")?.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") document.getElementById("portal-rut-btn").click();
+});
+
+function renderAprobaciones() {
+  const tbody = document.querySelector("#aprobacion-table tbody");
+  tbody.innerHTML = APROBACIONES.map(a => `
+    <tr>
+      <td><b>${a.num}</b></td>
+      <td>${a.enviada}</td>
+      <td>${a.resuelta}</td>
+      <td>${a.tiempo}</td>
+      <td><span class="badge ${a.badge}">${a.estado}</span></td>
+    </tr>
+  `).join("");
+}
+renderAprobaciones();
+
+// ============ CENTROS DE COSTO / BOLSA DE VALORES (propuesta) ============
+function fmtCLP(n) {
+  return "$" + Math.round(n).toLocaleString("es-CL");
+}
+function bolsaLevel(pct) {
+  if (pct >= 100) return "danger";
+  if (pct >= 80) return "warn";
+  return "ok";
+}
+// Degradé continuo verde -> ámbar -> rojo según % consumido (no por tramos fijos).
+function bolsaColor(pct) {
+  const p = Math.max(0, Math.min(100, pct));
+  const stops = [
+    { p: 0, c: [4, 133, 53] },     // verde
+    { p: 55, c: [101, 150, 20] },  // verde-oliva (transición)
+    { p: 80, c: [217, 119, 6] },   // ámbar
+    { p: 100, c: [220, 38, 38] },  // rojo
+  ];
+  let lo = stops[0], hi = stops[stops.length - 1];
+  for (let i = 0; i < stops.length - 1; i++) {
+    if (p >= stops[i].p && p <= stops[i + 1].p) { lo = stops[i]; hi = stops[i + 1]; break; }
+  }
+  const range = (hi.p - lo.p) || 1;
+  const t = (p - lo.p) / range;
+  const c = lo.c.map((v, i) => Math.round(v + (hi.c[i] - v) * t));
+  return `rgb(${c[0]},${c[1]},${c[2]})`;
+}
+function barraHtml(asignado, consumido) {
+  const pct = Math.min(100, (consumido / asignado) * 100);
+  const color = bolsaColor(pct);
+  return `<div class="bolsa-bar-bg"><div class="bolsa-bar-fill" style="width:${pct}%;background:${color}"></div></div>`;
+}
+
+function renderCentrosCosto() {
+  const wrap = document.getElementById("centros-costo-list");
+  if (!wrap) return;
+  wrap.innerHTML = CENTROS_COSTO.map(c => {
+    const presupuesto = centroPresupuesto(c);
+    const consumido = centroConsumido(c);
+    const catRows = c.categorias.map(cat => `
+      <div style="margin-top:10px">
+        <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px">
+          <span>${cat.nombre} <span style="color:var(--muted)">· ${cat.cod}</span></span>
+          <span style="color:var(--muted)">${fmtCLP(cat.consumido)} / ${fmtCLP(cat.asignado)}</span>
+        </div>
+        ${barraHtml(cat.asignado, cat.consumido)}
+      </div>
+    `).join("");
+    return `
+      <div class="card" style="margin-bottom:20px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px">
+          <h3 style="margin:0;font-size:16px">${c.nombre}</h3>
+          <span style="font-size:12.5px;color:var(--muted)">Presupuesto total: <b style="color:var(--text)">${fmtCLP(presupuesto)}</b> · Consumido: <b style="color:var(--text)">${fmtCLP(consumido)}</b></span>
+        </div>
+        <p style="font-size:12px;color:var(--muted);margin:10px 0 0">Bolsa de valores — por categoría de artículo</p>
+        ${catRows}
+      </div>`;
+  }).join("");
+}
+renderCentrosCosto();
+
+// ============ COMPRAS POR CATEGORÍA / POR PROVEEDOR (Reportes) ============
+function aggregateLineas() {
+  const porCategoria = {};
+  const porProveedor = {};
+  OCS.forEach(oc => {
+    const lineas = LINEAS_OC[oc.num] || [];
+    lineas.forEach(l => {
+      porCategoria[l.categoria] = (porCategoria[l.categoria] || 0) + l.importe;
+      porProveedor[oc.proveedor] = (porProveedor[oc.proveedor] || 0) + l.importe;
+    });
+  });
+  return { porCategoria, porProveedor };
+}
+
+function renderBarraList(containerId, data) {
+  const wrap = document.getElementById(containerId);
+  if (!wrap) return;
+  const entries = Object.entries(data).sort((a, b) => b[1] - a[1]);
+  const total = entries.reduce((s, [, v]) => s + v, 0);
+  wrap.innerHTML = entries.map(([nombre, monto]) => {
+    const pct = total ? (monto / total * 100) : 0;
+    return `
+      <div style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px">
+          <span>${nombre}</span>
+          <span style="color:var(--muted)">${fmtCLP(monto)} <span style="color:#c7cbd1">· ${pct.toFixed(0)}%</span></span>
+        </div>
+        <div class="bolsa-bar-bg"><div class="bolsa-bar-fill" style="width:${pct}%"></div></div>
+      </div>`;
+  }).join("");
+}
+
+function renderComprasAgregadas() {
+  const { porCategoria, porProveedor } = aggregateLineas();
+  renderBarraList("compras-categoria-list", porCategoria);
+  renderBarraList("compras-proveedor-list", porProveedor);
+}
+renderComprasAgregadas();
+
+function simulateImpact(centroId, cod, monto) {
+  const centro = CENTROS_COSTO.find(c => c.id === centroId);
+  const cat = centro.categorias.find(x => x.cod === cod);
+  const nuevoConsumido = cat.consumido + monto;
+  const pct = Math.min(999, (nuevoConsumido / cat.asignado) * 100);
+  const disponible = cat.asignado - nuevoConsumido;
+  const level = pct >= 100 ? "danger" : pct >= 80 ? "warn" : "ok";
+  return { centro, cat, pct, disponible, level };
+}
+function impactMessage({ centro, cat, pct, disponible }) {
+  return pct >= 100
+    ? `Esta OC deja la bolsa <b>${cat.nombre}</b> de <b>${centro.nombre}</b> en <b>${pct.toFixed(1)}%</b> — se pasaría por ${fmtCLP(Math.abs(disponible))}. Necesitaría una excepción o aprobación adicional.`
+    : `Si se aprueba, la bolsa <b>${cat.nombre}</b> de <b>${centro.nombre}</b> quedaría en <b>${pct.toFixed(1)}%</b> consumida, con <b>${fmtCLP(disponible)}</b> disponible.`;
+}
+
+// ============ NUEVO CENTRO DE COSTO ============
+const centroModal = document.getElementById("centro-modal");
+const centroCatRows = document.getElementById("centro-cat-rows");
+
+function addCentroCatRow(nombre = "", monto = "") {
+  const row = document.createElement("div");
+  row.className = "centro-cat-row";
+  row.innerHTML = `
+    <input type="text" class="centro-cat-nombre" placeholder="Categoría, ej: Refrigeración" value="${nombre}">
+    <input type="text" class="centro-cat-monto" placeholder="Presupuesto asignado" value="${monto}">
+    <span class="centro-cat-remove"><svg class="svgi" viewBox="0 0 24 24"><use href="#i-xmark"/></svg></span>
+  `;
+  row.querySelector(".centro-cat-remove").addEventListener("click", () => row.remove());
+  centroCatRows.appendChild(row);
+}
+
+document.getElementById("open-centro-btn")?.addEventListener("click", () => {
+  document.getElementById("centro-nombre").value = "";
+  centroCatRows.innerHTML = "";
+  addCentroCatRow("Refrigeración");
+  addCentroCatRow("Habilitadores (imagen)");
+  addCentroCatRow("General / otros");
+  document.getElementById("centro-error").style.display = "none";
+  centroModal.classList.add("show");
+});
+document.getElementById("centro-close")?.addEventListener("click", () => centroModal.classList.remove("show"));
+document.getElementById("centro-add-cat-btn")?.addEventListener("click", () => addCentroCatRow());
+
+document.getElementById("centro-submit-btn")?.addEventListener("click", () => {
+  const nombre = document.getElementById("centro-nombre").value.trim();
+  const catRows = Array.from(centroCatRows.querySelectorAll(".centro-cat-row")).map(row => ({
+    nombre: row.querySelector(".centro-cat-nombre").value.trim(),
+    monto: parseInt(row.querySelector(".centro-cat-monto").value.replace(/[^\d]/g, "") || "0", 10),
+  })).filter(c => c.nombre && c.monto);
+
+  if (!nombre || !catRows.length) {
+    document.getElementById("centro-error").style.display = "block";
+    return;
+  }
+  document.getElementById("centro-error").style.display = "none";
+
+  const nuevoId = "CC-" + String(100 + CENTROS_COSTO.length + 1);
+  CENTROS_COSTO.push({
+    id: nuevoId,
+    nombre,
+    categorias: catRows.map((c, i) => ({
+      cod: c.nombre.slice(0, 2).toUpperCase() + i,
+      nombre: c.nombre,
+      asignado: c.monto,
+      consumido: 0,
+    })),
+  });
+
+  renderCentrosCosto();
+  populateSolCentroSelect();
+  centroModal.classList.remove("show");
+});
+
+// ============ MAESTRO DE PROVEEDORES ============
+function renderProveedores() {
+  const tbody = document.querySelector("#proveedores-table tbody");
+  if (!tbody) return;
+  tbody.innerHTML = PROVEEDORES.map((p, idx) => `
+    <tr>
+      <td><b>${p.nombre}</b></td>
+      <td>${p.rut}</td>
+      <td>${p.categoria}</td>
+      <td>${p.banco} <span style="color:var(--muted);font-size:11.5px">· ${p.tipoCuenta}</span></td>
+      <td>${p.cuenta}</td>
+      <td>${p.condicionPago}</td>
+      <td><span class="badge ${p.estado === "Activo" ? "ok" : "late"}">${p.estado}</span></td>
+      <td><span class="proveedor-edit-btn" data-idx="${idx}" style="color:var(--green);font-weight:600;font-size:12.5px;cursor:pointer">Editar</span></td>
+    </tr>
+  `).join("");
+}
+renderProveedores();
+
+const proveedorModal = document.getElementById("proveedor-modal");
+let proveedorEditIdx = null;
+
+function fillProveedorForm(p) {
+  document.getElementById("proveedor-nombre").value = p ? p.nombre : "";
+  document.getElementById("proveedor-rut").value = p ? p.rut : "";
+  document.getElementById("proveedor-categoria").value = p ? p.categoria : "Refrigeración";
+  document.getElementById("proveedor-banco").value = p ? p.banco : "Banco Estado";
+  document.getElementById("proveedor-tipo-cuenta").value = p ? p.tipoCuenta : "Cuenta corriente";
+  document.getElementById("proveedor-cuenta").value = p ? p.cuenta : "";
+  document.getElementById("proveedor-condicion").value = p ? p.condicionPago : "30 días";
+  document.getElementById("proveedor-error").style.display = "none";
+}
+
+document.getElementById("open-proveedor-btn")?.addEventListener("click", () => {
+  proveedorEditIdx = null;
+  document.getElementById("proveedor-modal-title").textContent = "Nuevo proveedor";
+  fillProveedorForm(null);
+  proveedorModal.classList.add("show");
+});
+
+document.querySelector("#proveedores-table")?.addEventListener("click", (e) => {
+  const btn = e.target.closest(".proveedor-edit-btn");
+  if (!btn) return;
+  proveedorEditIdx = parseInt(btn.dataset.idx, 10);
+  document.getElementById("proveedor-modal-title").textContent = "Editar proveedor";
+  fillProveedorForm(PROVEEDORES[proveedorEditIdx]);
+  proveedorModal.classList.add("show");
+});
+
+document.getElementById("proveedor-close")?.addEventListener("click", () => proveedorModal.classList.remove("show"));
+
+document.getElementById("proveedor-submit-btn")?.addEventListener("click", () => {
+  const nombre = document.getElementById("proveedor-nombre").value.trim();
+  const rut = document.getElementById("proveedor-rut").value.trim();
+  const cuenta = document.getElementById("proveedor-cuenta").value.trim();
+  const categoria = document.getElementById("proveedor-categoria").value;
+  const banco = document.getElementById("proveedor-banco").value;
+  const tipoCuenta = document.getElementById("proveedor-tipo-cuenta").value;
+  const condicionPago = document.getElementById("proveedor-condicion").value;
+
+  if (!nombre || !rut || !cuenta) {
+    document.getElementById("proveedor-error").style.display = "block";
+    return;
+  }
+  document.getElementById("proveedor-error").style.display = "none";
+
+  const registro = { nombre, rut, categoria, banco, tipoCuenta, cuenta, condicionPago, estado: "Activo" };
+  if (proveedorEditIdx !== null) {
+    PROVEEDORES[proveedorEditIdx] = { ...PROVEEDORES[proveedorEditIdx], ...registro };
+  } else {
+    PROVEEDORES.push(registro);
+  }
+
+  renderProveedores();
+  proveedorModal.classList.remove("show");
+});
+
+// ============ BUSCAR OC Y VINCULAR A PRESUPUESTO ============
+// La OC ya no se crea acá: se crea en i10. Este modal solo la busca por
+// número (o remite a Cargar datos), infiere automáticamente a qué categoría
+// de la bolsa de presupuesto corresponde (según proveedor/producto) y
+// registra su impacto en el centro de costo que el usuario elija — el
+// centro (la sucursal) siempre lo elige la persona, nunca se infiere solo.
+const solicitudModal = document.getElementById("solicitud-modal");
+const solCentro = document.getElementById("sol-centro");
+const solCategoria = document.getElementById("sol-categoria");
+const solBolsaCard = document.getElementById("sol-bolsa-card");
+const solSimBox = document.getElementById("sol-sim-box");
+const solSuccess = document.getElementById("sol-success");
+const solOcNumero = document.getElementById("sol-oc-numero");
+const solOcError = document.getElementById("sol-oc-error");
+const solOcResultado = document.getElementById("sol-oc-resultado");
+let solOcActual = null; // { num, proveedor, producto, cantidad, montoNum, fuente, categoriaSugerida }
+
+// Se guarda apenas se vincula una OC a su presupuesto en Compras, para que al
+// llegar la guía en Bodega el sistema ya sepa a qué bolsa descontar sin volver
+// a preguntar (paso manual una sola vez, reutilizado después automático).
+const VINCULACIONES_OC = {};
+
+// OCs que ya existen en i10 pero todavía no se han cargado a este sistema —
+// simulan lo que traería una búsqueda por número contra Oracle.
+const I10_PENDIENTES = {
+	"19501": { proveedor: "Repuestos Refrigeración Ltda.", producto: "Compresor para vitrina refrigerada", cantidad: 1, udm: "UNIDAD", monto: 890000, fecha: "24-ago-2026" },
+	"19502": { proveedor: "Habilitadores Retail Ltda.", producto: "Señalética exterior sucursal nueva", cantidad: 8, udm: "UNIDAD", monto: 640000, fecha: "23-ago-2026" },
+	"19503": { proveedor: "Suministros Generales OXXO", producto: "Insumos de aseo y bodega", cantidad: 12, udm: "CAJA", monto: 210000, fecha: "22-ago-2026" },
+};
+
+function parseCLP(s) {
+	return parseInt(String(s).replace(/[^\d]/g, ""), 10) || 0;
+}
+
+// Infiere automáticamente la categoría de la bolsa de presupuesto según el
+// proveedor y el producto de la OC (palabras clave). Es una simulación para
+// la demo — en el sistema real esto se afinaría con el maestro de artículos
+// de Oracle, pero la idea (proveedor/producto → categoría) es la misma.
+function inferirCategoria(proveedor, producto) {
+	const texto = `${proveedor} ${producto}`.toLowerCase();
+	const reglas = [
+		{ cod: "RF", palabras: ["refriger", "vitrina", "frío", "frio", "congela", "cámara fría", "camara fria"] },
+		{ cod: "HB", palabras: ["imagen", "gráfic", "grafic", "señaliz", "señalét", "senalet", "nps", "letrero", "luminos", "acrílic", "acrilic", "tótem", "totem", "habilit"] },
+	];
+	for (const regla of reglas) {
+		if (regla.palabras.some(p => texto.includes(p))) return regla.cod;
+	}
+	return "GN"; // General / otros, por defecto
+}
+
+function buscarOC(numero) {
+	numero = numero.trim();
+	if (!numero) return null;
+	const existente = OCS.find(oc => oc.num === numero);
+	if (existente) {
+		return {
+			num: numero, proveedor: existente.proveedor, producto: existente.producto,
+			cantidad: null, montoNum: parseCLP(existente.monto), fuente: "ya-cargada",
+			categoriaSugerida: inferirCategoria(existente.proveedor, existente.producto),
+		};
+	}
+	const pend = I10_PENDIENTES[numero];
+	if (pend) {
+		return {
+			num: numero, proveedor: pend.proveedor, producto: pend.producto,
+			cantidad: `${pend.cantidad} ${pend.udm}`, montoNum: pend.monto, fuente: "i10",
+			categoriaSugerida: inferirCategoria(pend.proveedor, pend.producto),
+		};
+	}
+	return null;
+}
+
+// Centro de costo → categoría: selects en cascada
+function populateSolCategoriaSelect(centroId, categoriaSugerida) {
+	const centro = CENTROS_COSTO.find(c => c.id === centroId);
+	solCategoria.innerHTML = centro
+		? centro.categorias.map(cat => `<option value="${cat.cod}">${cat.nombre} (${cat.cod})</option>`).join("")
+		: "";
+	if (categoriaSugerida && centro && centro.categorias.some(c => c.cod === categoriaSugerida)) {
+		solCategoria.value = categoriaSugerida;
+	}
+}
+function populateSolCentroSelect(categoriaSugerida) {
+	const prev = solCentro.value;
+	solCentro.innerHTML = CENTROS_COSTO.map(c => `<option value="${c.id}">${c.nombre}</option>`).join("");
+	solCentro.value = CENTROS_COSTO.some(c => c.id === prev) ? prev : (CENTROS_COSTO[0] && CENTROS_COSTO[0].id);
+	populateSolCategoriaSelect(solCentro.value, categoriaSugerida);
+}
+
+// Al cambiar de centro (sucursal) — decisión manual del usuario — se
+// mantiene la categoría ya inferida para la OC actual, si existe en ese centro.
+solCentro.addEventListener("change", () => {
+	populateSolCategoriaSelect(solCentro.value, solOcActual && solOcActual.categoriaSugerida);
+	updateSolSim();
+});
+solCategoria.addEventListener("change", updateSolSim);
+
+function renderSolBolsaCard() {
+	const centro = CENTROS_COSTO.find(c => c.id === solCentro.value);
+	const cat = centro && centro.categorias.find(x => x.cod === solCategoria.value);
+	if (!centro || !cat) { solBolsaCard.innerHTML = ""; solBolsaCard.className = "bolsa-card-lg"; return; }
+	const pct = Math.min(100, (cat.consumido / cat.asignado) * 100);
+	const level = bolsaLevel(pct);
+	const color = bolsaColor(pct);
+	const disponible = cat.asignado - cat.consumido;
+	solBolsaCard.className = `bolsa-card-lg ${level === "ok" ? "" : level}`;
+	solBolsaCard.innerHTML = `
+		<div class="bolsa-lg-head">
+			<div>
+				<h4>${cat.nombre}</h4>
+				<div class="cod">${centro.nombre} · Código ${cat.cod}</div>
+			</div>
+			<div class="bolsa-lg-pct" style="color:${color}">${pct.toFixed(0)}%</div>
+		</div>
+		<div class="bolsa-bar-bg bolsa-bar-bg-lg"><div class="bolsa-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+		<div class="bolsa-lg-stats">
+			<div><span>Asignado</span><b>${fmtCLP(cat.asignado)}</b></div>
+			<div><span>Consumido</span><b>${fmtCLP(cat.consumido)}</b></div>
+			<div><span>Disponible</span><b>${fmtCLP(disponible)}</b></div>
+		</div>`;
+}
+
+function updateSolSim() {
+	renderSolBolsaCard();
+	if (!solOcActual) { solSimBox.style.display = "none"; return; }
+	const impact = simulateImpact(solCentro.value, solCategoria.value, solOcActual.montoNum);
+	solSimBox.style.display = "block";
+	solSimBox.className = "sim-box " + impact.level;
+	solSimBox.innerHTML = impactMessage(impact);
+}
+
+function buscarYMostrarOC(numero) {
+	const res = buscarOC(numero);
+	if (!res) {
+		solOcError.style.display = "block";
+		solOcResultado.style.display = "none";
+		solOcActual = null;
+		document.getElementById("sol-submit-btn").style.display = "none";
+		return;
+	}
+	solOcError.style.display = "none";
+	solOcActual = res;
+	document.getElementById("sol-oc-proveedor").textContent = res.proveedor;
+	document.getElementById("sol-oc-producto").textContent = res.producto;
+	document.getElementById("sol-oc-cantidad").textContent = res.cantidad || "—";
+	document.getElementById("sol-oc-monto").textContent = fmtCLP(res.montoNum);
+	document.getElementById("sol-oc-fuente").textContent = res.fuente === "i10" ? "i10 (aún no cargada en Compras)" : "Ya cargada en Compras";
+	solOcResultado.style.display = "block";
+	populateSolCentroSelect(res.categoriaSugerida);
+	document.getElementById("sol-submit-btn").style.display = "block";
+	solSuccess.style.display = "none";
+	updateSolSim();
+}
+
+document.getElementById("sol-oc-buscar-btn").addEventListener("click", () => buscarYMostrarOC(solOcNumero.value));
+document.querySelectorAll("#sol-oc-chips .oc-chip").forEach(chip => {
+	chip.addEventListener("click", () => {
+		solOcNumero.value = chip.dataset.oc;
+		buscarYMostrarOC(chip.dataset.oc);
+	});
+});
+solOcNumero.addEventListener("keypress", (e) => { if (e.key === "Enter") document.getElementById("sol-oc-buscar-btn").click(); });
+
+// Tabs del modal: N° de OC (i10) vs Cargar datos
+document.querySelectorAll("#sol-subtabs .subtab").forEach(tab => {
+	tab.addEventListener("click", () => {
+		document.querySelectorAll("#sol-subtabs .subtab").forEach(t => t.classList.toggle("active", t === tab));
+		const key = tab.dataset.solview;
+		document.getElementById("sol-subview-i10").style.display = key === "i10" ? "block" : "none";
+		document.getElementById("sol-subview-carga").style.display = key === "carga" ? "block" : "none";
+	});
+});
+document.getElementById("sol-ir-carga-btn").addEventListener("click", () => {
+	solicitudModal.classList.remove("show");
+	goToView("carga");
+});
+
+document.getElementById("open-solicitud-btn").addEventListener("click", () => {
+	solOcNumero.value = "";
+	solOcError.style.display = "none";
+	solOcResultado.style.display = "none";
+	solOcActual = null;
+	document.getElementById("sol-baja-activo").checked = false;
+	solSuccess.style.display = "none";
+	document.getElementById("sol-submit-btn").style.display = "none";
+	document.querySelectorAll("#sol-subtabs .subtab").forEach(t => t.classList.toggle("active", t.dataset.solview === "i10"));
+	document.getElementById("sol-subview-i10").style.display = "block";
+	document.getElementById("sol-subview-carga").style.display = "none";
+	solicitudModal.classList.add("show");
+});
+document.getElementById("sol-close").addEventListener("click", () => solicitudModal.classList.remove("show"));
+
+document.getElementById("sol-submit-btn").addEventListener("click", () => {
+	if (!solOcActual) return;
+	const centro = CENTROS_COSTO.find(c => c.id === solCentro.value);
+	const cat = centro.categorias.find(x => x.cod === solCategoria.value);
+	cat.consumido += solOcActual.montoNum;
+	VINCULACIONES_OC[solOcActual.num] = { centroId: solCentro.value, catCod: solCategoria.value };
+
+	if (solOcActual.fuente === "i10") {
+		OCS.unshift({
+			num: solOcActual.num, proveedor: solOcActual.proveedor, producto: solOcActual.producto,
+			monto: fmtCLP(solOcActual.montoNum), estado: "En Oracle EBS", badge: "info",
+		});
+		renderOCs(OCS);
+	}
+
+	renderCentrosCosto();
+	renderSolBolsaCard();
+
+	document.getElementById("sol-submit-btn").style.display = "none";
+	solSuccess.style.display = "block";
+	solSuccess.className = "sim-box ok";
+	solSuccess.innerHTML = `<b><svg class="svgi" viewBox="0 0 24 24"><use href="#i-circle-check"/></svg> Vinculada a presupuesto</b><br>La OC <b>${solOcActual.num}</b> quedó registrada contra <b>${cat.nombre} · ${centro.nombre}</b>. La OC en sí se sigue gestionando y aprobando en i10 — esto solo actualiza la bolsa de presupuesto.`;
+});
+
+// ============ REGISTRAR GUIA (Bodega: entrada / salida) ============
+// Las guías (igual que las OC) se crean en i10, no en esta app — acá solo se
+// busca por número, se traen los datos ya declarados allá, y se registra el
+// movimiento resultante. Solo la cantidad queda editable, por si lo recibido
+// o despachado realmente difiere de lo que declara la guía.
+
+// Guías de entrada ya creadas en i10 (llegada de mercadería desde un
+// proveedor, ligada a su OC de origen). Datos de ejemplo para la demo.
+const GUIAS_ENTRADA_I10 = {
+	"GD-33210": { oc: "18892", proveedor: "Cerámicas Cordillera Ltda.", producto: "Porcelanato Cosmopolitan 60x60", cantidad: 190, udm: "M2", monto: 2280000, sucursal: "Sucursal Nueva — Talca Centro" },
+	"GD-33251": { oc: "18877", proveedor: "Refrigeración del Sur SpA", producto: "Vitrina refrigerada 2 puertas", cantidad: 1, udm: "UNIDAD", monto: 3150000, sucursal: "Sucursal Nueva — Curicó Oriente" },
+	"GD-40112": { oc: "19501", proveedor: "Repuestos Refrigeración Ltda.", producto: "Compresor para vitrina refrigerada", cantidad: 1, udm: "UNIDAD", monto: 890000, sucursal: "Sucursal Nueva — Curicó Oriente" },
+};
+
+// Guías de salida ya creadas en i10 (despacho interno de bodega central a
+// otra sucursal/departamento — no ligadas a ninguna OC ni presupuesto).
+const GUIAS_SALIDA_I10 = {
+	"GS-51002": { producto: "Horno industrial 2 bandejas", cantidad: 1, udm: "UNIDAD", sucursal: "Sucursal OXXO Providencia", motivo: "Traslado a sucursal" },
+	"GS-51009": { producto: "Insumo perecible ejemplo", cantidad: 5, udm: "CAJA", sucursal: "Sucursal OXXO Sur", motivo: "Despacho a sucursal" },
+	"GS-51015": { producto: "Vitrina refrigerada", cantidad: 1, udm: "UNIDAD", sucursal: "Sucursal OXXO Centro", motivo: "Traslado a sucursal" },
+};
+
+let guiaInDatos = null;
+const guiaInModal = document.getElementById("guia-entrada-modal");
+function renderGuiaInChips() {
+	const wrap = document.getElementById("guia-in-chips");
+	if (!wrap) return;
+	wrap.innerHTML = Object.entries(GUIAS_ENTRADA_I10).map(([num, d]) =>
+		`<span class="oc-chip" data-guia="${num}">${num} · ${d.proveedor} · ${d.producto}</span>`
+	).join("");
+	wrap.querySelectorAll(".oc-chip").forEach(chip => {
+		chip.addEventListener("click", () => {
+			document.getElementById("guia-in-numero").value = chip.dataset.guia;
+			document.getElementById("guia-in-buscar-btn").click();
+		});
+	});
+}
+document.getElementById("open-guia-entrada-btn")?.addEventListener("click", () => {
+	document.getElementById("guia-in-numero").value = "";
+	document.getElementById("guia-in-error").style.display = "none";
+	document.getElementById("guia-in-form").style.display = "none";
+	document.getElementById("guia-in-success").style.display = "none";
+	renderGuiaInChips();
+	guiaInModal.classList.add("show");
+});
+document.getElementById("guia-in-close")?.addEventListener("click", () => guiaInModal.classList.remove("show"));
+
+document.getElementById("auto-sync-entrada-toggle")?.addEventListener("change", (e) => {
+	const note = document.getElementById("auto-sync-entrada-note");
+	if (!note) return;
+	if (e.target.checked) {
+		note.textContent = "Las guías de i10 sin diferencias quedan registradas solas — revisa aquí solo las que necesiten ajuste.";
+		note.classList.remove("paused");
+	} else {
+		note.textContent = "Sincronización pausada — registra las guías aquí de forma manual.";
+		note.classList.add("paused");
+	}
+});
+
+function actualizarGuiaInMontoPreview() {
+	if (!guiaInDatos) return;
+	const cantidad = parseFloat(document.getElementById("guia-in-cantidad").value) || 0;
+	const precioUnit = guiaInDatos.cantidad ? guiaInDatos.monto / guiaInDatos.cantidad : 0;
+	document.getElementById("guia-in-monto-preview").textContent = fmtCLP(precioUnit * cantidad);
+}
+document.getElementById("guia-in-cantidad")?.addEventListener("input", actualizarGuiaInMontoPreview);
+
+document.getElementById("guia-in-buscar-btn")?.addEventListener("click", () => {
+	const numero = document.getElementById("guia-in-numero").value.trim();
+	const datos = GUIAS_ENTRADA_I10[numero];
+	const errorEl = document.getElementById("guia-in-error");
+	const formEl = document.getElementById("guia-in-form");
+	if (!datos) {
+		errorEl.style.display = "block";
+		formEl.style.display = "none";
+		return;
+	}
+	errorEl.style.display = "none";
+	guiaInDatos = { numero, ...datos };
+	document.getElementById("guia-in-proveedor").textContent = datos.proveedor;
+	document.getElementById("guia-in-producto").textContent = datos.producto;
+	document.getElementById("guia-in-oc").textContent = datos.oc;
+	document.getElementById("guia-in-sucursal").textContent = datos.sucursal;
+	document.getElementById("guia-in-cantidad").value = datos.cantidad;
+	document.getElementById("guia-in-udm").value = datos.udm;
+	actualizarGuiaInMontoPreview();
+
+	const vinculo = VINCULACIONES_OC[datos.oc];
+	const noteEl = document.getElementById("guia-in-bolsa-note");
+	noteEl.style.display = "block";
+	if (vinculo) {
+		const centro = CENTROS_COSTO.find(c => c.id === vinculo.centroId);
+		const cat = centro && centro.categorias.find(x => x.cod === vinculo.catCod);
+		noteEl.className = "sim-box ok";
+		noteEl.innerHTML = `La OC ${datos.oc} ya está vinculada a <b>${cat ? cat.nombre : ""} · ${centro ? centro.nombre : ""}</b> — al confirmar, se descuenta ahí automático.`;
+	} else {
+		noteEl.className = "sim-box warn";
+		noteEl.innerHTML = `La OC ${datos.oc} todavía no está vinculada a un centro de costo (hazlo en Compras → "Buscar OC y verificar presupuesto"). El inventario se actualiza igual al confirmar aquí.`;
+	}
+
+	formEl.style.display = "block";
+	document.getElementById("guia-in-success").style.display = "none";
+});
+
+document.getElementById("guia-in-submit-btn")?.addEventListener("click", () => {
+	if (!guiaInDatos) return;
+	const cantidad = parseFloat(document.getElementById("guia-in-cantidad").value) || 0;
+	const precioUnit = guiaInDatos.cantidad ? guiaInDatos.monto / guiaInDatos.cantidad : 0;
+	const monto = Math.round(precioUnit * cantidad);
+	const hoy = new Date();
+
+	LOTES_ACTIVO[guiaInDatos.producto] = LOTES_ACTIVO[guiaInDatos.producto] || [];
+	LOTES_ACTIVO[guiaInDatos.producto].push({
+		oc: guiaInDatos.oc, fecha: fmtFechaCorta(hoy), cantidad, udm: guiaInDatos.udm, precio: precioUnit,
+		proveedor: guiaInDatos.proveedor, sucursal: guiaInDatos.sucursal, vence: null,
+	});
+
+	const vinculo = VINCULACIONES_OC[guiaInDatos.oc];
+	let bolsaMsg = "";
+	if (vinculo) {
+		const centro = CENTROS_COSTO.find(c => c.id === vinculo.centroId);
+		const cat = centro && centro.categorias.find(x => x.cod === vinculo.catCod);
+		if (centro && cat) {
+			cat.consumido += monto;
+			bolsaMsg = ` y se descontó ${fmtCLP(monto)} de la bolsa <b>${cat.nombre}</b> — ${centro.nombre}`;
+			renderCentrosCosto();
+		}
+	}
+
+	MOVIMIENTOS_HOY.unshift({
+		hora: `${String(hoy.getHours()).padStart(2, "0")}:${String(hoy.getMinutes()).padStart(2, "0")}`,
+		tipo: "entrada", producto: guiaInDatos.producto, cantidad, udm: guiaInDatos.udm, guia: guiaInDatos.numero,
+		oc: guiaInDatos.oc, origen: "i10", centroId: vinculo ? vinculo.centroId : null, catCod: vinculo ? vinculo.catCod : null, monto,
+	});
+
+	renderEntradaBodega();
+	renderActivos();
+	renderMovimientosHoy();
+
+	document.getElementById("guia-in-form").style.display = "none";
+	const successEl = document.getElementById("guia-in-success");
+	successEl.style.display = "block";
+	successEl.innerHTML = `<b style="color:var(--green)"><svg class="svgi" viewBox="0 0 24 24"><use href="#i-circle-check"/></svg> Guía ${guiaInDatos.numero} registrada</b><br>Se sumó al inventario${bolsaMsg}.`;
+});
+
+// Descuenta cantidad de los lotes más antiguos primero (mismo orden FIFO que
+// se muestra en Stock). Devuelve el precio unitario de referencia usado, o
+// null si la cantidad pedida supera el disponible.
+function descontarFIFO(producto, cantidadSolicitada) {
+	const lotes = (LOTES_ACTIVO[producto] || []).slice().sort((a, b) => parseFechaCorta(a.fecha) - parseFechaCorta(b.fecha));
+	const totalDisponible = lotes.reduce((s, l) => s + l.cantidad, 0);
+	if (cantidadSolicitada <= 0 || cantidadSolicitada > totalDisponible) return null;
+	let restante = cantidadSolicitada;
+	const precioRef = lotes.length ? lotes[0].precio : 0;
+	const actualizados = [];
+	for (const lote of lotes) {
+		if (restante <= 0) { actualizados.push(lote); continue; }
+		if (lote.cantidad <= restante) {
+			restante -= lote.cantidad;
+		} else {
+			actualizados.push({ ...lote, cantidad: lote.cantidad - restante });
+			restante = 0;
+		}
+	}
+	LOTES_ACTIVO[producto] = actualizados;
+	return precioRef;
+}
+
+let guiaOutDatos = null;
+const guiaOutModal = document.getElementById("guia-salida-modal");
+function renderGuiaOutChips() {
+	const wrap = document.getElementById("guia-out-chips");
+	if (!wrap) return;
+	wrap.innerHTML = Object.entries(GUIAS_SALIDA_I10).map(([num, d]) =>
+		`<span class="oc-chip" data-guia="${num}">${num} · ${d.producto} · a ${d.sucursal}</span>`
+	).join("");
+	wrap.querySelectorAll(".oc-chip").forEach(chip => {
+		chip.addEventListener("click", () => {
+			document.getElementById("guia-out-numero").value = chip.dataset.guia;
+			document.getElementById("guia-out-buscar-btn").click();
+		});
+	});
+}
+document.getElementById("open-guia-salida-btn")?.addEventListener("click", () => {
+	document.getElementById("guia-out-numero").value = "";
+	document.getElementById("guia-out-error").style.display = "none";
+	document.getElementById("guia-out-form").style.display = "none";
+	document.getElementById("guia-out-success").style.display = "none";
+	renderGuiaOutChips();
+	guiaOutModal.classList.add("show");
+});
+document.getElementById("guia-out-close")?.addEventListener("click", () => guiaOutModal.classList.remove("show"));
+
+document.getElementById("auto-sync-salida-toggle")?.addEventListener("change", (e) => {
+	const note = document.getElementById("auto-sync-salida-note");
+	if (!note) return;
+	if (e.target.checked) {
+		note.textContent = "Los despachos de i10 sin diferencias quedan registrados solos — revisa aquí solo los que necesiten ajuste.";
+		note.classList.remove("paused");
+	} else {
+		note.textContent = "Sincronización pausada — registra los despachos aquí de forma manual.";
+		note.classList.add("paused");
+	}
+});
+
+document.getElementById("guia-out-buscar-btn")?.addEventListener("click", () => {
+	const numero = document.getElementById("guia-out-numero").value.trim();
+	const datos = GUIAS_SALIDA_I10[numero];
+	const errorEl = document.getElementById("guia-out-error");
+	const formEl = document.getElementById("guia-out-form");
+	if (!datos) {
+		errorEl.textContent = "No encontramos esa guía en i10.";
+		errorEl.style.display = "block";
+		formEl.style.display = "none";
+		return;
+	}
+	errorEl.style.display = "none";
+	guiaOutDatos = { numero, ...datos };
+	document.getElementById("guia-out-producto").textContent = datos.producto;
+	document.getElementById("guia-out-sucursal").textContent = datos.sucursal;
+	document.getElementById("guia-out-motivo").textContent = datos.motivo;
+	document.getElementById("guia-out-cantidad").value = datos.cantidad;
+	document.getElementById("guia-out-udm").value = datos.udm;
+	formEl.style.display = "block";
+	document.getElementById("guia-out-success").style.display = "none";
+});
+
+document.getElementById("guia-out-submit-btn")?.addEventListener("click", () => {
+	if (!guiaOutDatos) return;
+	const producto = guiaOutDatos.producto;
+	const cantidad = parseFloat(document.getElementById("guia-out-cantidad").value) || 0;
+	const errorEl = document.getElementById("guia-out-error");
+
+	const lotesOrdenados = (LOTES_ACTIVO[producto] || []).slice().sort((a, b) => parseFechaCorta(a.fecha) - parseFechaCorta(b.fecha));
+	const disponible = lotesOrdenados.reduce((s, l) => s + l.cantidad, 0);
+	if (cantidad <= 0) {
+		errorEl.textContent = "Indica una cantidad válida.";
+		errorEl.style.display = "block";
+		return;
+	}
+	if (cantidad > disponible) {
+		errorEl.textContent = `Solo hay ${disponible} disponible en stock.`;
+		errorEl.style.display = "block";
+		return;
+	}
+	errorEl.style.display = "none";
+
+	const precioRef = descontarFIFO(producto, cantidad);
+	const hoy = new Date();
+	SALIDAS_BODEGA.unshift({
+		fecha: fmtFechaCorta(hoy), documento: guiaOutDatos.numero, producto, cantidad, udm: guiaOutDatos.udm,
+		precio: precioRef || 0, sucursal: guiaOutDatos.sucursal, motivo: guiaOutDatos.motivo, responsable: CURRENT_USER,
+	});
+
+	MOVIMIENTOS_HOY.unshift({
+		hora: `${String(hoy.getHours()).padStart(2, "0")}:${String(hoy.getMinutes()).padStart(2, "0")}`,
+		tipo: "salida", producto, cantidad, udm: guiaOutDatos.udm, guia: guiaOutDatos.numero, oc: null,
+		origen: "i10", sucursal: guiaOutDatos.sucursal,
+	});
+
+	renderSalidaBodega();
+	renderActivos();
+	renderMovimientosHoy();
+
+	document.getElementById("guia-out-form").style.display = "none";
+	const successEl = document.getElementById("guia-out-success");
+	successEl.style.display = "block";
+	successEl.innerHTML = `<b style="color:var(--green)"><svg class="svgi" viewBox="0 0 24 24"><use href="#i-circle-check"/></svg> Guía ${guiaOutDatos.numero} registrada</b><br>Se descontó del inventario y quedó registrada como salida a ${guiaOutDatos.sucursal}.`;
+});
+
+document.getElementById("reportes-ir-centros-btn")?.addEventListener("click", () => goToView("centros"));
+
+// ============ CARGA DE DATOS DESDE ORACLE (simulada) ============
+const CURRENT_USER = "Randy Jiménez";
+const MESES = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+function fmtFecha(d) {
+  const dd = String(d.getDate()).padStart(2, "0");
+  const mm = MESES[d.getMonth()];
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mi = String(d.getMinutes()).padStart(2, "0");
+  return `${dd}-${mm}-${d.getFullYear()} ${hh}:${mi}`;
+}
+
+const cargaList = document.getElementById("carga-list");
+const cargaProgressFill = document.getElementById("carga-progress-fill");
+const cargaStatus = document.getElementById("carga-status");
+const cargaResult = document.getElementById("carga-result");
+const cargaFileInput = document.getElementById("carga-file-input");
+const cargaDropzone = document.getElementById("carga-dropzone");
+
+document.getElementById("carga-pick-btn").addEventListener("click", () => cargaFileInput.click());
+cargaFileInput.addEventListener("change", () => {
+  if (cargaFileInput.files.length) simulateCarga(Array.from(cargaFileInput.files));
+});
+["dragenter", "dragover"].forEach(evt =>
+  cargaDropzone.addEventListener(evt, (e) => { e.preventDefault(); cargaDropzone.classList.add("drag"); })
+);
+["dragleave", "drop"].forEach(evt =>
+  cargaDropzone.addEventListener(evt, (e) => { e.preventDefault(); cargaDropzone.classList.remove("drag"); })
+);
+cargaDropzone.addEventListener("drop", (e) => {
+  if (e.dataTransfer.files.length) simulateCarga(Array.from(e.dataTransfer.files));
+});
+
+function simulateCarga(files) {
+  cargaResult.style.display = "none";
+  cargaList.style.display = "block";
+  cargaProgressFill.style.width = "0%";
+  let i = 0;
+  const timer = setInterval(() => {
+    i++;
+    const pct = Math.min(100, (i / files.length) * 100);
+    cargaProgressFill.style.width = pct + "%";
+    cargaStatus.textContent = i <= files.length
+      ? `Procesando ${i} de ${files.length}: ${files[i - 1].name}`
+      : "Listo";
+    if (i >= files.length) {
+      clearInterval(timer);
+      setTimeout(finishCarga, 500);
+    }
+  }, 500);
+}
+
+function finishCarga() {
+  cargaList.style.display = "none";
+  cargaResult.style.display = "block";
+  const ocsNuevas = Math.floor(Math.random() * 40) + 180;
+  const activosNuevos = Math.floor(Math.random() * 10) + 4;
+  const facturasNuevas = Math.floor(Math.random() * 6) + 1;
+  cargaResult.innerHTML = `
+    <b><svg class="svgi" viewBox="0 0 24 24"><use href="#i-circle-check"/></svg> Datos actualizados</b><br>
+    OC actualizadas: <b>${ocsNuevas}</b><br>
+    Activos nuevos: <b>${activosNuevos}</b><br>
+    Facturas nuevas: <b>${facturasNuevas}</b>
+  `;
+  cargaFileInput.value = "";
+
+  const infoEl = document.getElementById("carga-last-info");
+  if (infoEl) infoEl.textContent = `${fmtFecha(new Date())} · por ${CURRENT_USER}`;
+}
+
+// ============ CARGA DE FACTURA (simulada, sin backend real) ============
+const dropzone = document.getElementById("dropzone");
+const fileInput = document.getElementById("file-input");
+const pickBtn = document.getElementById("pick-file-btn");
+const progressWrap = document.getElementById("progress-wrap");
+const progressFill = document.getElementById("progress-fill");
+const uploadStatus = document.getElementById("upload-status");
+const uploadResult = document.getElementById("upload-result");
+
+pickBtn.addEventListener("click", () => fileInput.click());
+fileInput.addEventListener("change", () => {
+  if (fileInput.files[0]) simulateUpload(fileInput.files[0]);
+});
+
+["dragenter", "dragover"].forEach(evt =>
+  dropzone.addEventListener(evt, (e) => { e.preventDefault(); dropzone.classList.add("drag"); })
+);
+["dragleave", "drop"].forEach(evt =>
+  dropzone.addEventListener(evt, (e) => { e.preventDefault(); dropzone.classList.remove("drag"); })
+);
+dropzone.addEventListener("drop", (e) => {
+  const file = e.dataTransfer.files[0];
+  if (file) simulateUpload(file);
+});
+
+function simulateUpload(file) {
+  uploadResult.style.display = "none";
+  progressWrap.style.display = "block";
+  progressFill.style.width = "0%";
+  uploadStatus.textContent = `Subiendo "${file.name}"...`;
+
+  let pct = 0;
+  const timer = setInterval(() => {
+    pct += Math.random() * 22 + 10;
+    if (pct >= 100) {
+      pct = 100;
+      clearInterval(timer);
+      uploadStatus.textContent = "Validando contra orden de compra...";
+      setTimeout(() => finishUpload(file), 700);
+    }
+    progressFill.style.width = pct + "%";
+  }, 250);
+}
+
+function finishUpload(file) {
+  progressWrap.style.display = "none";
+  const rec = "REC-" + Math.floor(10000 + Math.random() * 89999);
+  const now = new Date();
+  const hh = String(now.getHours()).padStart(2, "0");
+  const mm = String(now.getMinutes()).padStart(2, "0");
+  uploadResult.style.display = "block";
+  uploadResult.innerHTML = `
+    <b><svg class="svgi" viewBox="0 0 24 24"><use href="#i-circle-check"/></svg> Factura registrada</b><br>
+    Archivo: <b>${file.name}</b><br>
+    N° de recepción: <b>${rec}</b> · Ingresada a las ${hh}:${mm}<br>
+    Estado: pendiente de validar aprobación de OC en Oracle.
+  `;
+  fileInput.value = "";
+}
+
+// ============ AVISO: DEMO PENSADA PARA COMPUTADOR ============
+document.getElementById("mobile-warning-close")?.addEventListener("click", () => {
+  document.getElementById("mobile-warning").classList.add("dismissed");
+});
+
+</script>
 </body>
 </html>
